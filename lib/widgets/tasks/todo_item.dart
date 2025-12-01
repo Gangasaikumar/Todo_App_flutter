@@ -1,0 +1,156 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../models/todo.dart';
+import '../../providers/todo_provider.dart';
+import '../dialogs/add_todo_dialog.dart';
+
+class TodoItem extends StatelessWidget {
+  final Todo todo;
+  final int index;
+
+  const TodoItem({super.key, required this.todo, required this.index});
+
+  @override
+  Widget build(BuildContext context) {
+    return Dismissible(
+      key: Key(todo.id),
+      background: Container(
+        color: Colors.red,
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.only(right: 20),
+        child: const Icon(Icons.delete, color: Colors.white),
+      ),
+      direction: DismissDirection.endToStart,
+      onDismissed: (direction) {
+        Provider.of<TodoProvider>(context, listen: false).deleteTodo(todo.id);
+      },
+      child: GestureDetector(
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (context) =>
+                AddTodoDialog(initialDate: todo.date, todo: todo),
+          );
+        },
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white.withOpacity(0.05)
+                : Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Theme.of(context).brightness == Brightness.light
+                ? Border.all(color: Colors.grey[200]!)
+                : null,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                spreadRadius: 1,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              // Custom Checkbox
+              Transform.scale(
+                scale: 1.2,
+                child: Checkbox(
+                  value: todo.isCompleted,
+                  onChanged: (value) {
+                    Provider.of<TodoProvider>(
+                      context,
+                      listen: false,
+                    ).toggleTodoStatus(todo.id);
+                  },
+                  activeColor: Theme.of(context).primaryColor,
+                  checkColor: Colors.black,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  side: BorderSide(color: Colors.grey[400]!, width: 1.5),
+                ),
+              ),
+              const SizedBox(width: 12),
+              // Title and Category
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      todo.title,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        decoration: todo.isCompleted
+                            ? TextDecoration.lineThrough
+                            : null,
+                        color: todo.isCompleted
+                            ? Colors.grey
+                            : (Theme.of(context).brightness == Brightness.dark
+                                  ? Colors.white
+                                  : Colors.black87),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Provider.of<TodoProvider>(
+                          context,
+                        ).getCategoryColor(todo.category).withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        todo.category,
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: Provider.of<TodoProvider>(
+                            context,
+                          ).getCategoryColor(todo.category),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Edit Button
+              IconButton(
+                icon: Icon(
+                  Icons.edit_outlined,
+                  size: 20,
+                  color: Colors.grey[400],
+                ),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) =>
+                        AddTodoDialog(initialDate: todo.date, todo: todo),
+                  );
+                },
+              ),
+              // Drag Handle
+              if (index != -1)
+                ReorderableDragStartListener(
+                  index: index,
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    child: Icon(
+                      Icons.drag_indicator_rounded,
+                      color: Colors.grey[400],
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
