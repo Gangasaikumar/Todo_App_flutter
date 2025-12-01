@@ -132,7 +132,7 @@ class TodoProvider with ChangeNotifier {
     notifyListeners();
 
     if (reminderDateTime != null && reminderDateTime.isAfter(DateTime.now())) {
-      NotificationService().scheduleNotification(
+      AppNotificationService().scheduleNotification(
         id: newTodo.id.hashCode,
         title: 'Task Reminder',
         body: newTodo.title,
@@ -149,13 +149,13 @@ class TodoProvider with ChangeNotifier {
       notifyListeners();
 
       // Cancel existing notification
-      NotificationService().cancelNotification(todo.id.hashCode);
+      AppNotificationService().cancelNotification(todo.id.hashCode);
 
       // Schedule new if applicable
       if (todo.reminderDateTime != null &&
           !todo.isCompleted &&
           todo.reminderDateTime!.isAfter(DateTime.now())) {
-        NotificationService().scheduleNotification(
+        AppNotificationService().scheduleNotification(
           id: todo.id.hashCode,
           title: 'Task Reminder',
           body: todo.title,
@@ -171,7 +171,7 @@ class TodoProvider with ChangeNotifier {
       _todos.removeAt(index);
       saveTodos();
       notifyListeners();
-      NotificationService().cancelNotification(id.hashCode);
+      AppNotificationService().cancelNotification(id.hashCode);
     }
   }
 
@@ -183,13 +183,13 @@ class TodoProvider with ChangeNotifier {
       notifyListeners();
 
       if (_todos[index].isCompleted) {
-        NotificationService().cancelNotification(id.hashCode);
+        AppNotificationService().cancelNotification(id.hashCode);
       } else {
         // Reschedule if uncompleted and has future reminder
         final todo = _todos[index];
         if (todo.reminderDateTime != null &&
             todo.reminderDateTime!.isAfter(DateTime.now())) {
-          NotificationService().scheduleNotification(
+          AppNotificationService().scheduleNotification(
             id: todo.id.hashCode,
             title: 'Task Reminder',
             body: todo.title,

@@ -24,9 +24,26 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      NotificationService().requestPermissions();
+    // Initialize notifications
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await AppNotificationService().init();
+      await _requestPermissions();
+      // Show a test notification immediately to verify setup
+      await AppNotificationService().showImmediateNotification();
     });
+  }
+
+  Future<void> _requestPermissions() async {
+    final bool granted = await AppNotificationService().requestPermissions();
+    if (!granted && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Notifications are disabled. Enable them in settings for reminders.',
+          ),
+        ),
+      );
+    }
   }
 
   @override
