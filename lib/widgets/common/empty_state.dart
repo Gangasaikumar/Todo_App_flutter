@@ -9,7 +9,11 @@ class EmptyState extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.task_alt, size: 80, color: Colors.grey.withOpacity(0.5)),
+          Icon(
+            Icons.task_alt,
+            size: 80,
+            color: Colors.grey.withAlpha(128),
+          ), // 0.5 opacity
           const SizedBox(height: 16),
           Text(
             'No tasks found!',

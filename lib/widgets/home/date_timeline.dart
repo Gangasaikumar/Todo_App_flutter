@@ -36,7 +36,7 @@ class DateTimeline extends StatelessWidget {
                     color: isSelected
                         ? const Color(0xFFFBCB57) // Pastel Yellow
                         : (Theme.of(context).brightness == Brightness.dark
-                              ? Colors.white.withOpacity(0.1)
+                              ? Colors.white.withAlpha(25) // 0.1 opacity
                               : Colors.white),
                     borderRadius: BorderRadius.circular(16),
                     border:

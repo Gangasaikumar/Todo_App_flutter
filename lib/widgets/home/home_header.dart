@@ -14,7 +14,6 @@ class HomeHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Container(
       padding: const EdgeInsets.only(top: 50, bottom: 20),
       decoration: BoxDecoration(

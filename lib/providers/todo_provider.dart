@@ -151,6 +151,14 @@ class TodoProvider with ChangeNotifier {
     }
   }
 
+  Todo? findById(String id) {
+    try {
+      return _todos.firstWhere((todo) => todo.id == id);
+    } catch (e) {
+      return null;
+    }
+  }
+
   void reorderTodos(int oldIndex, int newIndex) {
     final currentTodos = todosForSelectedDate;
     final activeTodos = currentTodos.where((t) => !t.isCompleted).toList();
@@ -190,7 +198,6 @@ class TodoProvider with ChangeNotifier {
     CategoryModel(id: '1', name: 'Personal', colorValue: 0xFF2196F3), // Blue
     CategoryModel(id: '2', name: 'Work', colorValue: 0xFFF44336), // Red
     CategoryModel(id: '3', name: 'Study', colorValue: 0xFFFF9800), // Orange
-    CategoryModel(id: '4', name: 'Shopping', colorValue: 0xFF4CAF50), // Green
   ];
 
   List<CategoryModel> get categories => _categories;
@@ -227,7 +234,7 @@ class TodoProvider with ChangeNotifier {
     final newCategory = CategoryModel(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       name: name,
-      colorValue: color.value,
+      colorValue: color.toARGB32(),
     );
     _categories.add(newCategory);
     saveCategories();

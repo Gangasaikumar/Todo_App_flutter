@@ -8,11 +8,9 @@ class AppTheme {
       seedColor: const Color(0xFFFBCB57), // Yellow
       primary: const Color(0xFFFBCB57),
       secondary: const Color(0xFFF57F17), // Darker yellow/orange for secondary
-      background: const Color(0xFFF5F5FA),
       surface: Colors.white,
       onPrimary: Colors.white,
       onSecondary: Colors.white,
-      onBackground: Colors.black87,
       onSurface: Colors.black87,
     ),
     scaffoldBackgroundColor: const Color(0xFFF5F5FA),
@@ -53,11 +51,9 @@ class AppTheme {
       brightness: Brightness.dark,
       primary: const Color(0xFFFBCB57),
       secondary: const Color(0xFFF57F17),
-      background: const Color(0xFF121212),
       surface: const Color(0xFF1E1E1E),
       onPrimary: Colors.black,
       onSecondary: Colors.white,
-      onBackground: Colors.white,
       onSurface: Colors.white,
     ),
     scaffoldBackgroundColor: const Color(0xFF121212),

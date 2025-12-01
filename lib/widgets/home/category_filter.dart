@@ -27,7 +27,7 @@ class CategoryFilter extends StatelessWidget {
                   showCheckmark: true,
                   checkmarkColor: const Color(0xFF46539E),
                   selectedColor: Colors.white,
-                  backgroundColor: Colors.white.withOpacity(0.5),
+                  backgroundColor: Colors.white.withAlpha(128), // 0.5 opacity
                   labelStyle: const TextStyle(
                     color: Color(0xFF46539E),
                     fontWeight: FontWeight.bold,
@@ -61,8 +61,10 @@ class CategoryFilter extends StatelessWidget {
                     },
                     showCheckmark: true,
                     checkmarkColor: darkColor,
-                    selectedColor: categoryColor.withOpacity(0.3),
-                    backgroundColor: categoryColor.withOpacity(0.15),
+                    selectedColor: categoryColor.withAlpha(76), // 0.3 opacity
+                    backgroundColor: categoryColor.withAlpha(
+                      38,
+                    ), // 0.15 opacity
                     labelStyle: TextStyle(
                       color: darkColor,
                       fontWeight: FontWeight.bold,

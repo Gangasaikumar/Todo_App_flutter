@@ -63,7 +63,7 @@ class SingleDayTaskList extends StatelessWidget {
                       return Material(
                         elevation: elevation,
                         color: Colors.transparent,
-                        shadowColor: Colors.black.withOpacity(0.2),
+                        shadowColor: Colors.black.withAlpha(51), // 0.2 opacity
                         borderRadius: BorderRadius.circular(16),
                         child: child,
                       );

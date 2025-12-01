@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_quill/flutter_quill.dart' as quill;
 import '../../models/todo.dart';
 import '../../providers/todo_provider.dart';
 import '../dialogs/add_todo_dialog.dart';
@@ -11,12 +13,27 @@ class TodoItem extends StatelessWidget {
 
   const TodoItem({super.key, required this.todo, required this.index});
 
+  String _getPlainText(String details) {
+    if (details.isEmpty) return '';
+    try {
+      final json = jsonDecode(details);
+      final doc = quill.Document.fromJson(json);
+      return doc.toPlainText().trim().replaceAll('\n', ' ');
+    } catch (e) {
+      return details;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Dismissible(
       key: Key(todo.id),
       background: Container(
-        color: Colors.red,
+        margin: const EdgeInsets.only(bottom: 12),
+        decoration: BoxDecoration(
+          color: Colors.red,
+          borderRadius: BorderRadius.circular(16),
+        ),
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 20),
         child: const Icon(Icons.delete, color: Colors.white),
@@ -30,7 +47,7 @@ class TodoItem extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => TodoDetailScreen(todo: todo),
+              builder: (context) => TodoDetailScreen(todoId: todo.id),
             ),
           );
         },
@@ -39,7 +56,7 @@ class TodoItem extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: Theme.of(context).brightness == Brightness.dark
-                ? Colors.white.withOpacity(0.05)
+                ? Colors.white.withAlpha(13) // 0.05 opacity
                 : Colors.white,
             borderRadius: BorderRadius.circular(16),
             border: Theme.of(context).brightness == Brightness.light
@@ -47,7 +64,7 @@ class TodoItem extends StatelessWidget {
                 : null,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withAlpha(13), // 0.05 opacity
                 blurRadius: 10,
                 spreadRadius: 1,
                 offset: const Offset(0, 4),
@@ -101,13 +118,10 @@ class TodoItem extends StatelessWidget {
                     if (todo.details.isNotEmpty) ...[
                       const SizedBox(height: 4),
                       Text(
-                        todo.details,
+                        _getPlainText(todo.details),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                        ),
+                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                       ),
                     ],
                     const SizedBox(height: 8),
@@ -117,9 +131,9 @@ class TodoItem extends StatelessWidget {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: Provider.of<TodoProvider>(
-                          context,
-                        ).getCategoryColor(todo.category).withOpacity(0.15),
+                        color: Provider.of<TodoProvider>(context)
+                            .getCategoryColor(todo.category)
+                            .withAlpha(38), // 0.15 opacity
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(

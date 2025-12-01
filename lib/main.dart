@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import 'providers/todo_provider.dart';
 import 'providers/theme_provider.dart';
 import 'utils/app_theme.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'screens/splash_screen.dart';
 
 void main() async {
@@ -31,6 +33,13 @@ class MyApp extends StatelessWidget {
             darkTheme: AppTheme.darkTheme,
             themeMode: themeProvider.themeMode,
             home: const SplashScreen(),
+            localizationsDelegates: const [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+              FlutterQuillLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('en', 'US')],
           );
         },
       ),
