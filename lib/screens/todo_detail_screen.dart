@@ -166,6 +166,19 @@ class _TodoDetailScreenState extends State<TodoDetailScreen> {
                       ),
                     ],
                   ),
+                  if (todo.reminderDateTime != null) ...[
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Icon(Icons.alarm, size: 16, color: subTextColor),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Reminder: ${DateFormat('MMM d, h:mm a').format(todo.reminderDateTime!)}',
+                          style: TextStyle(color: subTextColor, fontSize: 14),
+                        ),
+                      ],
+                    ),
+                  ],
                   const SizedBox(height: 32),
 
                   // Details

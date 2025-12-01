@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/todo.dart';
 import '../models/category_model.dart';
+import '../services/notification_service.dart';
 
 class TodoProvider with ChangeNotifier {
   List<Todo> _todos = [];
@@ -111,17 +112,33 @@ class TodoProvider with ChangeNotifier {
     }
   }
 
-  void addTodo(String title, DateTime date, String category, String details) {
+  void addTodo(
+    String title,
+    DateTime date,
+    String category,
+    String details,
+    DateTime? reminderDateTime,
+  ) {
     final newTodo = Todo(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       title: title,
       date: date,
       category: category,
       details: details,
+      reminderDateTime: reminderDateTime,
     );
     _todos.add(newTodo);
     saveTodos();
     notifyListeners();
+
+    if (reminderDateTime != null && reminderDateTime.isAfter(DateTime.now())) {
+      NotificationService().scheduleNotification(
+        id: newTodo.id.hashCode,
+        title: 'Task Reminder',
+        body: newTodo.title,
+        scheduledDate: reminderDateTime,
+      );
+    }
   }
 
   void updateTodo(Todo todo) {
@@ -130,6 +147,21 @@ class TodoProvider with ChangeNotifier {
       _todos[index] = todo;
       saveTodos();
       notifyListeners();
+
+      // Cancel existing notification
+      NotificationService().cancelNotification(todo.id.hashCode);
+
+      // Schedule new if applicable
+      if (todo.reminderDateTime != null &&
+          !todo.isCompleted &&
+          todo.reminderDateTime!.isAfter(DateTime.now())) {
+        NotificationService().scheduleNotification(
+          id: todo.id.hashCode,
+          title: 'Task Reminder',
+          body: todo.title,
+          scheduledDate: todo.reminderDateTime!,
+        );
+      }
     }
   }
 
@@ -139,6 +171,7 @@ class TodoProvider with ChangeNotifier {
       _todos.removeAt(index);
       saveTodos();
       notifyListeners();
+      NotificationService().cancelNotification(id.hashCode);
     }
   }
 
@@ -148,6 +181,22 @@ class TodoProvider with ChangeNotifier {
       _todos[index].isCompleted = !_todos[index].isCompleted;
       saveTodos();
       notifyListeners();
+
+      if (_todos[index].isCompleted) {
+        NotificationService().cancelNotification(id.hashCode);
+      } else {
+        // Reschedule if uncompleted and has future reminder
+        final todo = _todos[index];
+        if (todo.reminderDateTime != null &&
+            todo.reminderDateTime!.isAfter(DateTime.now())) {
+          NotificationService().scheduleNotification(
+            id: todo.id.hashCode,
+            title: 'Task Reminder',
+            body: todo.title,
+            scheduledDate: todo.reminderDateTime!,
+          );
+        }
+      }
     }
   }
 

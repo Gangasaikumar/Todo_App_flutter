@@ -12,10 +12,10 @@ void main() {
 
       // Add some sample todos
       final date = DateTime.now();
-      provider.addTodo('Buy Milk', date, 'Shopping', '');
-      provider.addTodo('Finish Report', date, 'Work', '');
-      provider.addTodo('Call Mom', date, 'Personal', '');
-      provider.addTodo('Buy Eggs', date, 'Shopping', '');
+      provider.addTodo('Buy Milk', date, 'Shopping', '', null);
+      provider.addTodo('Finish Report', date, 'Work', '', null);
+      provider.addTodo('Call Mom', date, 'Personal', '', null);
+      provider.addTodo('Buy Eggs', date, 'Shopping', '', null);
     });
 
     test('Search filters todos by title', () {
@@ -55,7 +55,7 @@ void main() {
       expect(provider.todosForSelectedDate.length, 2);
 
       // Add a non-shopping item with 'Buy' in title
-      provider.addTodo('Buy Software', DateTime.now(), 'Work', '');
+      provider.addTodo('Buy Software', DateTime.now(), 'Work', '', null);
 
       // Should still be 2 because 'Buy Software' is Work
       expect(provider.todosForSelectedDate.length, 2);

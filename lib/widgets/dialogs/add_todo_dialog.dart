@@ -24,6 +24,7 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
   dynamic
   _subscription; // Use dynamic to avoid import issues with StreamSubscription if not imported
   late DateTime _selectedDate;
+  TimeOfDay? _selectedReminderTime;
   late String _selectedCategory;
   final FocusNode _editorFocusNode = FocusNode();
   final ScrollController _editorScrollController = ScrollController();
@@ -33,6 +34,13 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
     super.initState();
     _titleController = TextEditingController(text: widget.todo?.title ?? '');
     _selectedDate = widget.todo?.date ?? widget.initialDate;
+    if (widget.todo?.reminderDateTime != null) {
+      _selectedReminderTime = TimeOfDay.fromDateTime(
+        widget.todo!.reminderDateTime!,
+      );
+    } else {
+      _selectedReminderTime = null;
+    }
     _selectedCategory = widget.todo?.category ?? 'Personal';
 
     // Initialize Quill Controller
@@ -224,43 +232,129 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
               ),
 
               const SizedBox(height: 16),
-              Text('Date', style: TextStyle(color: textColor)),
-              const SizedBox(height: 8),
-              InkWell(
-                onTap: () async {
-                  final DateTime? picked = await showDatePicker(
-                    context: context,
-                    initialDate: _selectedDate,
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2101),
-                  );
-                  if (picked != null) {
-                    setState(() {
-                      _selectedDate = picked;
-                    });
-                  }
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 12,
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Date', style: TextStyle(color: textColor)),
+                        const SizedBox(height: 8),
+                        InkWell(
+                          onTap: () async {
+                            final DateTime? picked = await showDatePicker(
+                              context: context,
+                              initialDate: _selectedDate,
+                              firstDate: DateTime(2000),
+                              lastDate: DateTime(2101),
+                            );
+                            if (picked != null) {
+                              setState(() {
+                                _selectedDate = picked;
+                              });
+                            }
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 12,
+                            ),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: borderColor),
+                              borderRadius: BorderRadius.circular(12),
+                              color: inputFillColor,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  DateFormat(
+                                    'MMM d, yyyy',
+                                  ).format(_selectedDate),
+                                  style: TextStyle(color: textColor),
+                                ),
+                                Icon(
+                                  Icons.calendar_today,
+                                  size: 20,
+                                  color: textColor,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: borderColor),
-                    borderRadius: BorderRadius.circular(12),
-                    color: inputFillColor,
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Reminder', style: TextStyle(color: textColor)),
+                        const SizedBox(height: 8),
+                        InkWell(
+                          onTap: () async {
+                            final TimeOfDay? picked = await showTimePicker(
+                              context: context,
+                              initialTime:
+                                  _selectedReminderTime ?? TimeOfDay.now(),
+                            );
+                            if (picked != null) {
+                              setState(() {
+                                _selectedReminderTime = picked;
+                              });
+                            } else {
+                              // Optional: Allow clearing reminder?
+                              // For now, just keep previous or null
+                            }
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 12,
+                            ),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: borderColor),
+                              borderRadius: BorderRadius.circular(12),
+                              color: inputFillColor,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  _selectedReminderTime != null
+                                      ? _selectedReminderTime!.format(context)
+                                      : 'No Reminder',
+                                  style: TextStyle(
+                                    color: _selectedReminderTime != null
+                                        ? textColor
+                                        : hintColor,
+                                  ),
+                                ),
+                                if (_selectedReminderTime != null)
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        _selectedReminderTime = null;
+                                      });
+                                    },
+                                    child: Icon(
+                                      Icons.close,
+                                      size: 20,
+                                      color: textColor,
+                                    ),
+                                  )
+                                else
+                                  Icon(Icons.alarm, size: 20, color: textColor),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        DateFormat('MMM d, yyyy').format(_selectedDate),
-                        style: TextStyle(color: textColor),
-                      ),
-                      Icon(Icons.calendar_today, size: 20, color: textColor),
-                    ],
-                  ),
-                ),
+                ],
               ),
               const SizedBox(height: 16),
               Text(
@@ -382,6 +476,17 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
                 _quillController.document.toDelta().toJson(),
               );
 
+              DateTime? reminderDateTime;
+              if (_selectedReminderTime != null) {
+                reminderDateTime = DateTime(
+                  _selectedDate.year,
+                  _selectedDate.month,
+                  _selectedDate.day,
+                  _selectedReminderTime!.hour,
+                  _selectedReminderTime!.minute,
+                );
+              }
+
               if (isEditing) {
                 Provider.of<TodoProvider>(context, listen: false).updateTodo(
                   Todo(
@@ -391,6 +496,7 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
                     category: _selectedCategory,
                     details: detailsJson,
                     isCompleted: widget.todo!.isCompleted,
+                    reminderDateTime: reminderDateTime,
                   ),
                 );
               } else {
@@ -399,6 +505,7 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
                   _selectedDate,
                   _selectedCategory,
                   detailsJson,
+                  reminderDateTime,
                 );
               }
               Navigator.pop(context);
