@@ -9,6 +9,7 @@ import '../widgets/home/uncompleted_tasks_card.dart';
 import '../widgets/dialogs/add_todo_dialog.dart';
 import '../widgets/home/single_day_task_list.dart';
 import '../widgets/home/all_tasks_list.dart';
+import '../services/notification_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,11 +24,13 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      NotificationService().requestPermissions();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Column(

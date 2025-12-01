@@ -13,7 +13,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   await NotificationService().init();
-  await NotificationService().requestPermissions();
   runApp(const MyApp());
 }
 
