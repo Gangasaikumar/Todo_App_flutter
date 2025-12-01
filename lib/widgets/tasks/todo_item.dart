@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../models/todo.dart';
 import '../../providers/todo_provider.dart';
 import '../dialogs/add_todo_dialog.dart';
+import '../../screens/todo_detail_screen.dart';
 
 class TodoItem extends StatelessWidget {
   final Todo todo;
@@ -26,10 +27,11 @@ class TodoItem extends StatelessWidget {
       },
       child: GestureDetector(
         onTap: () {
-          showDialog(
-            context: context,
-            builder: (context) =>
-                AddTodoDialog(initialDate: todo.date, todo: todo),
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => TodoDetailScreen(todo: todo),
+            ),
           );
         },
         child: Container(
@@ -81,6 +83,8 @@ class TodoItem extends StatelessWidget {
                   children: [
                     Text(
                       todo.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -94,6 +98,18 @@ class TodoItem extends StatelessWidget {
                                   : Colors.black87),
                       ),
                     ),
+                    if (todo.details.isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        todo.details,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(

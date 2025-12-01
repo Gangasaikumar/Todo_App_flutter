@@ -17,6 +17,7 @@ class AddTodoDialog extends StatefulWidget {
 
 class _AddTodoDialogState extends State<AddTodoDialog> {
   late TextEditingController _titleController;
+  late TextEditingController _detailsController;
   late DateTime _selectedDate;
   late String _selectedCategory;
 
@@ -25,10 +26,12 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
     super.initState();
     if (widget.todo != null) {
       _titleController = TextEditingController(text: widget.todo!.title);
+      _detailsController = TextEditingController(text: widget.todo!.details);
       _selectedDate = widget.todo!.date;
       _selectedCategory = widget.todo!.category;
     } else {
       _titleController = TextEditingController();
+      _detailsController = TextEditingController();
       _selectedDate = widget.initialDate;
       _selectedCategory = 'Personal';
     }
@@ -37,6 +40,7 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
   @override
   void dispose() {
     _titleController.dispose();
+    _detailsController.dispose();
     super.dispose();
   }
 
@@ -54,6 +58,24 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
               controller: _titleController,
               decoration: InputDecoration(
                 hintText: 'Task Title',
+                border: const OutlineInputBorder(),
+                filled: true,
+                fillColor: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFF2C2C2C)
+                    : Colors.transparent,
+                hintStyle: TextStyle(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.grey[400]
+                      : Colors.grey[600],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _detailsController,
+              maxLines: 3,
+              decoration: InputDecoration(
+                hintText: 'Details (Optional)',
                 border: const OutlineInputBorder(),
                 filled: true,
                 fillColor: Theme.of(context).brightness == Brightness.dark
@@ -216,6 +238,7 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
                     title: _titleController.text,
                     date: _selectedDate,
                     category: _selectedCategory,
+                    details: _detailsController.text,
                     isCompleted: widget.todo!.isCompleted,
                   ),
                 );
@@ -224,19 +247,22 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
                   _titleController.text,
                   _selectedDate,
                   _selectedCategory,
+                  _detailsController.text,
                 );
               }
               Navigator.pop(context);
             }
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            foregroundColor: Colors.black,
+            backgroundColor: Theme.of(context).brightness == Brightness.dark
+                ? Theme.of(context).colorScheme.primary
+                : Colors.black,
+            foregroundColor: Theme.of(context).brightness == Brightness.dark
+                ? Colors.black
+                : Colors.white,
             elevation: 0,
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
+            shape: const StadiumBorder(),
           ),
           child: Text(
             isEditing ? 'Save Task' : 'Add Task',

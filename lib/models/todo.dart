@@ -5,6 +5,7 @@ class Todo {
   DateTime date;
 
   String category;
+  String details;
 
   Todo({
     required this.id,
@@ -12,6 +13,7 @@ class Todo {
     this.isCompleted = false,
     required this.date,
     this.category = 'Personal',
+    this.details = '',
   });
 
   factory Todo.fromJson(Map<String, dynamic> json) {
@@ -23,6 +25,7 @@ class Todo {
           ? DateTime.parse(json['date'])
           : DateTime.now(),
       category: json['category'] ?? 'Personal',
+      details: json['details'] ?? '',
     );
   }
 
@@ -33,6 +36,7 @@ class Todo {
       'isCompleted': isCompleted,
       'date': date.toIso8601String(),
       'category': category,
+      'details': details,
     };
   }
 }

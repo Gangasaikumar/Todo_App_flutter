@@ -95,7 +95,7 @@ class TodoProvider with ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      debugPrint('Error loading todos: $e');
+      // Error loading todos
     }
   }
 
@@ -107,16 +107,17 @@ class TodoProvider with ChangeNotifier {
       );
       await prefs.setString('todos', todosString);
     } catch (e) {
-      debugPrint('Error saving todos: $e');
+      // Error saving todos
     }
   }
 
-  void addTodo(String title, DateTime date, String category) {
+  void addTodo(String title, DateTime date, String category, String details) {
     final newTodo = Todo(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       title: title,
       date: date,
       category: category,
+      details: details,
     );
     _todos.add(newTodo);
     saveTodos();
@@ -206,7 +207,7 @@ class TodoProvider with ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      debugPrint('Error loading categories: $e');
+      // Error loading categories
     }
   }
 
@@ -218,7 +219,7 @@ class TodoProvider with ChangeNotifier {
       );
       await prefs.setString('categories', categoriesString);
     } catch (e) {
-      debugPrint('Error saving categories: $e');
+      // Error saving categories
     }
   }
 

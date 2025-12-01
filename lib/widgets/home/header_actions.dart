@@ -7,13 +7,11 @@ import 'clear_tasks_button.dart';
 class HeaderActions extends StatelessWidget {
   final bool showAllTasks;
   final VoidCallback onShowAllTasksChanged;
-  final VoidCallback onAddNew;
 
   const HeaderActions({
     super.key,
     required this.showAllTasks,
     required this.onShowAllTasksChanged,
-    required this.onAddNew,
   });
 
   @override
@@ -57,26 +55,6 @@ class HeaderActions extends StatelessWidget {
               onPressed: () {
                 themeProvider.toggleTheme(!themeProvider.isDarkMode);
               },
-            ),
-            const SizedBox(width: 8),
-            ElevatedButton(
-              onPressed: onAddNew,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: themeProvider.isDarkMode
-                    ? Theme.of(context).colorScheme.primary
-                    : Colors.black,
-                foregroundColor: themeProvider.isDarkMode
-                    ? Colors.black
-                    : Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 12,
-                ),
-              ),
-              child: const Text('Add New'),
             ),
           ],
         );

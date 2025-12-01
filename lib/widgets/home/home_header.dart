@@ -5,18 +5,16 @@ import 'header_actions.dart';
 class HomeHeader extends StatelessWidget {
   final bool showAllTasks;
   final VoidCallback onShowAllTasksChanged;
-  final VoidCallback onAddNew;
 
   const HomeHeader({
     super.key,
     required this.showAllTasks,
     required this.onShowAllTasksChanged,
-    required this.onAddNew,
   });
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('Building HomeHeader...');
+
     return Container(
       padding: const EdgeInsets.only(top: 50, bottom: 20),
       decoration: BoxDecoration(
@@ -39,7 +37,6 @@ class HomeHeader extends StatelessWidget {
                 HeaderActions(
                   showAllTasks: showAllTasks,
                   onShowAllTasksChanged: onShowAllTasksChanged,
-                  onAddNew: onAddNew,
                 ),
               ],
             ),

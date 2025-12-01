@@ -23,12 +23,11 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    debugPrint('HomeScreen initState');
   }
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('Building HomeScreen...');
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Column(
@@ -39,17 +38,6 @@ class _HomeScreenState extends State<HomeScreen> {
               setState(() {
                 _showAllTasks = !_showAllTasks;
               });
-            },
-            onAddNew: () {
-              showDialog(
-                context: context,
-                builder: (context) => AddTodoDialog(
-                  initialDate: Provider.of<TodoProvider>(
-                    context,
-                    listen: false,
-                  ).selectedDate,
-                ),
-              );
             },
           ),
           const SizedBox(height: 24),
@@ -83,6 +71,30 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ],
+      ),
+
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (context) => AddTodoDialog(
+              initialDate: Provider.of<TodoProvider>(
+                context,
+                listen: false,
+              ).selectedDate,
+            ),
+          );
+        },
+        icon: const Icon(Icons.add),
+        label: const Text('Add Task'),
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? Theme.of(context).colorScheme.primary
+            : Colors.black,
+        foregroundColor: Theme.of(context).brightness == Brightness.dark
+            ? Colors.black
+            : Colors.white,
+        shape: const StadiumBorder(),
       ),
     );
   }
