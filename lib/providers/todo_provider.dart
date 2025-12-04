@@ -139,6 +139,12 @@ class TodoProvider with ChangeNotifier {
         scheduledDate: reminderDateTime,
       );
     }
+
+    // Show immediate notification for task addition
+    AppNotificationService().showNotification(
+      title: 'Task Added',
+      body: 'Task "${newTodo.title}" has been added successfully.',
+    );
   }
 
   void updateTodo(Todo todo) {
@@ -162,6 +168,12 @@ class TodoProvider with ChangeNotifier {
           scheduledDate: todo.reminderDateTime!,
         );
       }
+
+      // Show immediate notification for task update
+      AppNotificationService().showNotification(
+        title: 'Task Updated',
+        body: 'Task "${todo.title}" has been updated successfully.',
+      );
     }
   }
 

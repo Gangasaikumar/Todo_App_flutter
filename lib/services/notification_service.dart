@@ -111,8 +111,41 @@ class AppNotificationService {
 
     await flutterLocalNotificationsPlugin.show(
       0,
-      'Test Notification',
-      'If you see this, notifications are working!',
+      'App opened',
+      'He Hi welcome to our app!',
+      notificationDetails,
+    );
+  }
+
+  Future<void> showNotification({
+    required String title,
+    required String body,
+  }) async {
+    await init();
+
+    const AndroidNotificationDetails androidDetails =
+        AndroidNotificationDetails(
+          'task_reminders_v2',
+          'Task Reminders V2',
+          channelDescription: 'Notifications for task reminders',
+          importance: Importance.max,
+          priority: Priority.high,
+          showWhen: true,
+          enableVibration: true,
+          playSound: true,
+        );
+
+    const NotificationDetails notificationDetails = NotificationDetails(
+      android: androidDetails,
+    );
+
+    // Use a unique ID based on time to avoid overwriting
+    final int notificationId = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+
+    await flutterLocalNotificationsPlugin.show(
+      notificationId,
+      title,
+      body,
       notificationDetails,
     );
   }
@@ -147,19 +180,6 @@ class AppNotificationService {
         scheduledDate,
         tz.local,
       );
-
-      debugPrint('=== NOTIFICATION SCHEDULING DEBUG ===');
-      debugPrint('ID: $id');
-      debugPrint('Title: $title');
-      debugPrint('Body: $body');
-      debugPrint('Scheduled DateTime (input): $scheduledDate');
-      debugPrint('Scheduled TZDateTime (converted): $scheduledTZDate');
-      debugPrint('Current DateTime: ${DateTime.now()}');
-      debugPrint('Current TZDateTime: ${tz.TZDateTime.now(tz.local)}');
-      debugPrint(
-        'Time until notification: ${scheduledTZDate.difference(tz.TZDateTime.now(tz.local))}',
-      );
-      debugPrint('=====================================');
 
       await flutterLocalNotificationsPlugin.zonedSchedule(
         id,
