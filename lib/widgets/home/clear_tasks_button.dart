@@ -13,13 +13,7 @@ class ClearTasksButton extends StatelessWidget {
           return const SizedBox.shrink();
         }
 
-        return IconButton(
-          icon: Icon(
-            Icons.delete_sweep,
-            color: Theme.of(context).brightness == Brightness.dark
-                ? Colors.white
-                : Colors.black,
-          ),
+        return TextButton.icon(
           onPressed: () {
             showDialog(
               context: context,
@@ -47,6 +41,16 @@ class ClearTasksButton extends StatelessWidget {
               ),
             );
           },
+          icon: const Icon(Icons.delete_sweep, color: Colors.red),
+          label: const Text(
+            'Clear All',
+            style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+          ),
+          style: TextButton.styleFrom(
+            padding: EdgeInsets.zero,
+            minimumSize: Size.zero,
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
         );
       },
     );

@@ -6,24 +6,30 @@ class ThemeProvider with ChangeNotifier {
 
   ThemeMode get themeMode => _themeMode;
 
-  bool get isDarkMode => _themeMode == ThemeMode.dark;
+  bool get isDarkMode {
+    if (_themeMode == ThemeMode.system) {
+      return WidgetsBinding.instance.platformDispatcher.platformBrightness ==
+          Brightness.dark;
+    }
+    return _themeMode == ThemeMode.dark;
+  }
 
   ThemeProvider() {
     _loadTheme();
   }
 
-  void toggleTheme(bool isDark) {
-    _themeMode = isDark ? ThemeMode.dark : ThemeMode.light;
-    _saveTheme(isDark);
+  void setThemeMode(ThemeMode mode) {
+    _themeMode = mode;
+    _saveTheme(mode);
     notifyListeners();
   }
 
   Future<void> _loadTheme() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final isDark = prefs.getBool('isDarkMode');
-      if (isDark != null) {
-        _themeMode = isDark ? ThemeMode.dark : ThemeMode.light;
+      final themeIndex = prefs.getInt('theme_mode');
+      if (themeIndex != null) {
+        _themeMode = ThemeMode.values[themeIndex];
         notifyListeners();
       }
     } catch (e) {
@@ -31,10 +37,10 @@ class ThemeProvider with ChangeNotifier {
     }
   }
 
-  Future<void> _saveTheme(bool isDark) async {
+  Future<void> _saveTheme(ThemeMode mode) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('isDarkMode', isDark);
+      await prefs.setInt('theme_mode', mode.index);
     } catch (e) {
       // Error saving theme
     }

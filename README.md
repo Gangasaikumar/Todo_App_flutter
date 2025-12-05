@@ -26,6 +26,7 @@ A premium, feature-rich Todo application built with Flutter. Designed with a foc
 - **Edit Tasks**: Tap any task to edit its details.
 - **Delete**: Swipe left or tap the delete icon to remove a task.
 - **Complete**: Mark tasks as done with a satisfying checkbox toggle.
+- **Clear Date**: Use the **"Clear All"** button in the section header to instantly delete all tasks (active & completed) for the selected date.
 - **Drag & Drop**: Long-press and drag to reorder your tasks for the day.
 
 ### 4. 🏷️ Categories & Filtering
@@ -43,6 +44,17 @@ A premium, feature-rich Todo application built with Flutter. Designed with a foc
 ### 6. 🚀 Smooth Performance
 - **State Management**: Built using `Provider` for efficient state handling.
 - **Persistence**: Tasks are saved locally using **Isar Database**, ensuring lightning-fast performance and offline capability.
+
+### 7. 🔥 Gamification & Motivation
+- **Streak Counter**: Track your daily consistency with a streak flame counter on the home screen.
+- **Completion Sounds**: Get instant positive reinforcement with satisfying sound effects when checking off tasks (Toggleable in Settings).
+- **Onboarding Flow**: A seamless introduction guide for new users to get started.
+
+### 8. ⚙️ Settings & Personalization
+- **Theme Control**: Manually switch between Light, Dark, or System Default themes.
+- **Sound Effects**: Enable or disable completion sounds to suit your environment.
+- **Notifications**: Manage task reminders and alert preferences.
+- **Dashboard**: View detailed statistics of your productivity, including weekly completion charts and category breakdown.
 
 ## 📱 Screenshots
 

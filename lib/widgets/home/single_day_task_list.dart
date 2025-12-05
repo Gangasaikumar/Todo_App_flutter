@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../providers/todo_provider.dart';
 import '../tasks/todo_item.dart';
 import '../common/empty_state.dart';
+import 'clear_tasks_button.dart';
 
 class SingleDayTaskList extends StatelessWidget {
   const SingleDayTaskList({super.key});
@@ -34,15 +35,21 @@ class SingleDayTaskList extends StatelessWidget {
                   right: 20,
                   top: 20,
                 ),
-                child: Text(
-                  'Active Tasks',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.white
-                        : Colors.black87,
-                  ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Active Tasks',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            : Colors.black87,
+                      ),
+                    ),
+                    const ClearTasksButton(),
+                  ],
                 ),
               ),
             Expanded(
@@ -76,17 +83,23 @@ class SingleDayTaskList extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const SizedBox(height: 24),
-                          Text(
-                            'Completed',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color:
-                                  Theme.of(context).brightness ==
-                                      Brightness.dark
-                                  ? Colors.white
-                                  : Colors.black87,
-                            ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Completed',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color:
+                                      Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.white
+                                      : Colors.black87,
+                                ),
+                              ),
+                              if (activeTodos.isEmpty) const ClearTasksButton(),
+                            ],
                           ),
                           const SizedBox(height: 12),
                           ...completedTodos.map(

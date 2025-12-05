@@ -1343,15 +1343,13 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
                     onPressed: _saveTodo,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primaryColor,
-                      foregroundColor: Colors.white,
+                      foregroundColor: Colors.black,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 32,
                         vertical: 12,
                       ),
                       elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                      shape: const StadiumBorder(),
                     ),
                     child: Text(
                       widget.todo == null ? 'Create Task' : 'Save Changes',
