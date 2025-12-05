@@ -287,9 +287,9 @@ class TodoProvider with ChangeNotifier {
             category: todo.category,
             details: todo.details,
             // Adjust reminder if exists
-            reminderDateTime: todo.reminderDateTime != null
-                ? todo.reminderDateTime!.add(nextDate.difference(todo.date))
-                : null,
+            reminderDateTime: todo.reminderDateTime?.add(
+              nextDate.difference(todo.date),
+            ),
             recurrence: todo.recurrence,
             subtasks: newSubtasks,
           );
