@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import '../../providers/todo_provider.dart';
+import '../../models/todo.dart';
 import '../widgets/dialogs/add_todo_dialog.dart';
 
 class TodoDetailScreen extends StatefulWidget {
@@ -187,7 +188,87 @@ class _TodoDetailScreenState extends State<TodoDetailScreen> {
                       controller: _quillController,
                       scrollController: _editorScrollController,
                       focusNode: _editorFocusNode,
+                      config: const QuillEditorConfig(
+                        padding: EdgeInsets.zero,
+                        autoFocus: false,
+                        expands: false,
+                        scrollable: true,
+                        showCursor: false, // Read-only
+                      ),
                     ),
+
+                  const SizedBox(height: 32),
+
+                  // Subtasks
+                  if (todo.subtasks.isNotEmpty) ...[
+                    Text(
+                      'Subtasks',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: textColor,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    ...todo.subtasks.asMap().entries.map((entry) {
+                      final index = entry.key;
+                      final subtask = entry.value;
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Row(
+                          children: [
+                            Transform.scale(
+                              scale: 1.1,
+                              child: Checkbox(
+                                value: subtask.isCompleted,
+                                onChanged: (value) {
+                                  final updatedSubtasks = List<Subtask>.from(
+                                    todo.subtasks,
+                                  );
+                                  updatedSubtasks[index].isCompleted =
+                                      value ?? false;
+
+                                  final updatedTodo = Todo(
+                                    id: todo.id,
+                                    title: todo.title,
+                                    date: todo.date,
+                                    category: todo.category,
+                                    details: todo.details,
+                                    isCompleted: todo.isCompleted,
+                                    reminderDateTime: todo.reminderDateTime,
+                                    recurrence: todo.recurrence,
+                                    subtasks: updatedSubtasks,
+                                  );
+
+                                  Provider.of<TodoProvider>(
+                                    context,
+                                    listen: false,
+                                  ).updateTodo(updatedTodo);
+                                },
+                                activeColor: Theme.of(context).primaryColor,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                subtask.title,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: textColor,
+                                  decoration: subtask.isCompleted
+                                      ? TextDecoration.lineThrough
+                                      : null,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                  ],
                 ],
               ),
             ),

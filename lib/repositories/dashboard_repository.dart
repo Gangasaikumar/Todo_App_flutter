@@ -1,4 +1,6 @@
 import '../models/todo.dart';
+import '../services/isar_service.dart';
+import 'package:isar/isar.dart';
 
 class DashboardStats {
   final int totalTasks;
@@ -22,25 +24,30 @@ abstract class DashboardRepository {
   Future<DashboardStats> getStats({
     required DateTime startDate,
     required DateTime endDate,
-    required List<Todo> todos,
+    List<Todo>? todos,
   });
 }
 
 class LocalDashboardRepository implements DashboardRepository {
+  final IsarService _isarService = IsarService();
+
   @override
   Future<DashboardStats> getStats({
     required DateTime startDate,
     required DateTime endDate,
-    required List<Todo> todos,
+    List<Todo>? todos,
   }) async {
-    // Filter todos within range
-    final rangeTodos = todos.where((todo) {
-      final date = DateTime(todo.date.year, todo.date.month, todo.date.day);
-      final start = DateTime(startDate.year, startDate.month, startDate.day);
-      final end = DateTime(endDate.year, endDate.month, endDate.day);
-      return (date.isAtSameMomentAs(start) || date.isAfter(start)) &&
-          (date.isAtSameMomentAs(end) || date.isBefore(end));
-    }).toList();
+    final isar = await _isarService.db;
+
+    // Normalize dates to start and end of day
+    final start = DateTime(startDate.year, startDate.month, startDate.day);
+    final end = DateTime(endDate.year, endDate.month, endDate.day, 23, 59, 59);
+
+    // Fetch todos for the range
+    final rangeTodos = await isar.todos
+        .filter()
+        .dateBetween(start, end)
+        .findAll();
 
     final total = rangeTodos.length;
     final completed = rangeTodos.where((t) => t.isCompleted).length;
@@ -58,11 +65,13 @@ class LocalDashboardRepository implements DashboardRepository {
 
     for (int i = 0; i < 7; i++) {
       final date = endDate.subtract(Duration(days: 6 - i));
-      final dayTodos = todos.where((todo) {
-        return todo.date.year == date.year &&
-            todo.date.month == date.month &&
-            todo.date.day == date.day;
-      }).toList();
+      final dayStart = DateTime(date.year, date.month, date.day);
+      final dayEnd = DateTime(date.year, date.month, date.day, 23, 59, 59);
+
+      final dayTodos = await isar.todos
+          .filter()
+          .dateBetween(dayStart, dayEnd)
+          .findAll();
 
       weeklyCompleted[i] = dayTodos.where((t) => t.isCompleted).length;
       weeklyPending[i] = dayTodos.where((t) => !t.isCompleted).length;

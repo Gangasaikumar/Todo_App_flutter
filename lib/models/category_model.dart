@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:isar/isar.dart';
 
+part 'category_model.g.dart';
+
+@collection
 class CategoryModel {
+  Id isarId = Isar.autoIncrement;
+
+  @Index(unique: true, replace: true)
   final String id;
   final String name;
   final int colorValue;
@@ -11,6 +18,7 @@ class CategoryModel {
     required this.colorValue,
   });
 
+  @ignore
   Color get color => Color(colorValue);
 
   Map<String, dynamic> toJson() {

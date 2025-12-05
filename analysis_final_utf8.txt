@@ -1,5 +1,0 @@
-﻿Analyzing my_todo_app...                                        
-
-  error - The named parameter 'uiLocalNotificationDateInterpretation' isn't defined - lib\services\notification_service.dart:183:9 - undefined_named_parameter
-  error - Undefined name 'UILocalNotificationDateInterpretation' - lib\services\notification_service.dart:184:13 - undefined_identifier
-

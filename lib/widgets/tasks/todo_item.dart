@@ -125,27 +125,57 @@ class TodoItem extends StatelessWidget {
                       ),
                     ],
                     const SizedBox(height: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Provider.of<TodoProvider>(context)
-                            .getCategoryColor(todo.category)
-                            .withAlpha(38), // 0.15 opacity
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        todo.category,
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: Provider.of<TodoProvider>(
-                            context,
-                          ).getCategoryColor(todo.category),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Provider.of<TodoProvider>(context)
+                                .getCategoryColor(todo.category)
+                                .withAlpha(38), // 0.15 opacity
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            todo.category,
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: Provider.of<TodoProvider>(
+                                context,
+                              ).getCategoryColor(todo.category),
+                            ),
+                          ),
                         ),
-                      ),
+                        if (todo.recurrence != RecurrenceInterval.none) ...[
+                          const SizedBox(width: 8),
+                          Icon(
+                            Icons.repeat_rounded,
+                            size: 16,
+                            color: Colors.grey[500],
+                          ),
+                        ],
+                        if (todo.subtasks.isNotEmpty) ...[
+                          const SizedBox(width: 8),
+                          Icon(
+                            Icons.checklist_rounded,
+                            size: 16,
+                            color: Colors.grey[500],
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            '${todo.subtasks.where((s) => s.isCompleted).length}/${todo.subtasks.length}',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey[600],
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                   ],
                 ),

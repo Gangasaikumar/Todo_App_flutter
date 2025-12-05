@@ -1,4 +1,33 @@
+import 'package:isar/isar.dart';
+
+part 'todo.g.dart';
+
+@embedded
+class Subtask {
+  String title;
+  bool isCompleted;
+
+  Subtask({this.title = '', this.isCompleted = false});
+
+  factory Subtask.fromJson(Map<String, dynamic> json) {
+    return Subtask(
+      title: json['title'] ?? '',
+      isCompleted: json['isCompleted'] ?? false,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'title': title, 'isCompleted': isCompleted};
+  }
+}
+
+enum RecurrenceInterval { none, daily, weekly, monthly }
+
+@collection
 class Todo {
+  Id isarId = Isar.autoIncrement;
+
+  @Index(unique: true, replace: true)
   final String id;
   String title;
   bool isCompleted;
@@ -9,6 +38,11 @@ class Todo {
 
   DateTime? reminderDateTime;
 
+  @Enumerated(EnumType.name)
+  RecurrenceInterval recurrence;
+
+  List<Subtask> subtasks;
+
   Todo({
     required this.id,
     required this.title,
@@ -17,6 +51,8 @@ class Todo {
     this.category = 'Personal',
     this.details = '',
     this.reminderDateTime,
+    this.recurrence = RecurrenceInterval.none,
+    this.subtasks = const [],
   });
 
   factory Todo.fromJson(Map<String, dynamic> json) {
@@ -32,6 +68,15 @@ class Todo {
       reminderDateTime: json['reminderDateTime'] != null
           ? DateTime.parse(json['reminderDateTime'])
           : null,
+      recurrence: json['recurrence'] != null
+          ? RecurrenceInterval.values.firstWhere(
+              (e) => e.name == json['recurrence'],
+              orElse: () => RecurrenceInterval.none,
+            )
+          : RecurrenceInterval.none,
+      subtasks: json['subtasks'] != null
+          ? (json['subtasks'] as List).map((e) => Subtask.fromJson(e)).toList()
+          : [],
     );
   }
 
@@ -44,6 +89,8 @@ class Todo {
       'category': category,
       'details': details,
       'reminderDateTime': reminderDateTime?.toIso8601String(),
+      'recurrence': recurrence.name,
+      'subtasks': subtasks.map((e) => e.toJson()).toList(),
     };
   }
 }

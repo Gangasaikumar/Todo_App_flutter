@@ -19,6 +19,8 @@ A premium, feature-rich Todo application built with Flutter. Designed with a foc
 - **Animated Splash Screen**: Smooth fade and scale animation on launch with a seamless native transition.
 
 ### 3. ✅ Powerful Task Management
+- **Recurring Tasks**: Set tasks to repeat Daily, Weekly, or Monthly. The app automatically creates the next instance when you complete the current one.
+- **Subtasks**: Break down complex tasks into smaller, manageable steps. Track progress as you check them off.
 - **Rich Text Editor**: Create detailed notes with **Bold**, *Italic*, lists, and more using the integrated Quill editor.
 - **Add Tasks**: Quickly add tasks with a Title, Date, and Category.
 - **Edit Tasks**: Tap any task to edit its details.
@@ -28,6 +30,7 @@ A premium, feature-rich Todo application built with Flutter. Designed with a foc
 
 ### 4. 🏷️ Categories & Filtering
 - **Custom Categories**: Create your own categories with custom names and colors to suit your workflow.
+- **Advanced Color Picker**: Choose the perfect color using a **Circular Hue Wheel**, or input precise **Hex**, **RGB**, or **HSL** codes.
 - **Category Badges**: Organize tasks by categories like **Personal** (Blue), **Work** (Red), **Study** (Orange), and **Shopping** (Green).
 - **Visual Tags**: Each task card displays its category with a colored pill badge.
 - **Search**: Filter your tasks instantly by typing in the search bar.
@@ -39,7 +42,7 @@ A premium, feature-rich Todo application built with Flutter. Designed with a foc
 
 ### 6. 🚀 Smooth Performance
 - **State Management**: Built using `Provider` for efficient state handling.
-- **Persistence**: Tasks are saved locally using `SharedPreferences`, so you never lose your data.
+- **Persistence**: Tasks are saved locally using **Isar Database**, ensuring lightning-fast performance and offline capability.
 
 ## 📱 Screenshots
 
