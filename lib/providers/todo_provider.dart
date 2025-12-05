@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/todo.dart';
 import '../models/category_model.dart';
 import '../services/notification_service.dart';
+import '../repositories/dashboard_repository.dart';
 
 class TodoProvider with ChangeNotifier {
   List<Todo> _todos = [];
@@ -313,5 +314,55 @@ class TodoProvider with ChangeNotifier {
     } catch (e) {
       return Colors.grey;
     }
+  }
+
+  // Dashboard Logic
+  final DashboardRepository _dashboardRepository = LocalDashboardRepository();
+  DashboardStats? _dashboardStats;
+  DateTime _dashboardStartDate = DateTime.now().subtract(
+    const Duration(days: 6),
+  );
+  DateTime _dashboardEndDate = DateTime.now();
+  bool _isLoadingStats = false;
+
+  DashboardStats? get dashboardStats => _dashboardStats;
+  DateTime get dashboardStartDate => _dashboardStartDate;
+  DateTime get dashboardEndDate => _dashboardEndDate;
+  bool get isLoadingStats => _isLoadingStats;
+
+  Future<void> fetchDashboardStats() async {
+    _isLoadingStats = true;
+    notifyListeners();
+
+    try {
+      _dashboardStats = await _dashboardRepository.getStats(
+        startDate: _dashboardStartDate,
+        endDate: _dashboardEndDate,
+        todos: _todos,
+      );
+    } catch (e) {
+      debugPrint('Error fetching stats: $e');
+    } finally {
+      _isLoadingStats = false;
+      notifyListeners();
+    }
+  }
+
+  void setDashboardDateRange(DateTime start, DateTime end) {
+    _dashboardStartDate = start;
+    _dashboardEndDate = end;
+    fetchDashboardStats();
+  }
+
+  void nextWeek() {
+    _dashboardStartDate = _dashboardStartDate.add(const Duration(days: 7));
+    _dashboardEndDate = _dashboardEndDate.add(const Duration(days: 7));
+    fetchDashboardStats();
+  }
+
+  void previousWeek() {
+    _dashboardStartDate = _dashboardStartDate.subtract(const Duration(days: 7));
+    _dashboardEndDate = _dashboardEndDate.subtract(const Duration(days: 7));
+    fetchDashboardStats();
   }
 }

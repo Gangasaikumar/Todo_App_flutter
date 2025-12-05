@@ -169,9 +169,12 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
               // Rich Text Editor Container
               Container(
                 decoration: BoxDecoration(
-                  border: Border.all(color: borderColor),
                   borderRadius: BorderRadius.circular(12),
                   color: editorColor,
+                ),
+                foregroundDecoration: BoxDecoration(
+                  border: Border.all(color: borderColor),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 clipBehavior: Clip.antiAlias,
                 child: Column(

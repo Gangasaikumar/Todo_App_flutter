@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../providers/todo_provider.dart';
 import '../../providers/theme_provider.dart';
 import 'clear_tasks_button.dart';
+import '../../screens/dashboard_screen.dart';
 
 class HeaderActions extends StatelessWidget {
   final bool showAllTasks;
@@ -44,6 +45,23 @@ class HeaderActions extends StatelessWidget {
               },
             ),
             if (!showAllTasks) const ClearTasksButton(),
+            const SizedBox(width: 8),
+            IconButton(
+              icon: Icon(
+                Icons.bar_chart,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white
+                    : Colors.black,
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const DashboardScreen(),
+                  ),
+                );
+              },
+            ),
             const SizedBox(width: 8),
             IconButton(
               icon: Icon(
