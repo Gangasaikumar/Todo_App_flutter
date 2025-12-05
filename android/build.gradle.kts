@@ -28,6 +28,31 @@ subprojects {
             } catch (e: Exception) {
                 // Ignore
             }
+
+            try {
+                val compileOptionsMethod = android.javaClass.getMethod("getCompileOptions")
+                val compileOptions = compileOptionsMethod.invoke(android)
+
+                val setSourceCompatibility = compileOptions.javaClass.getMethod("setSourceCompatibility", JavaVersion::class.java)
+                setSourceCompatibility.invoke(compileOptions, JavaVersion.VERSION_17)
+
+                val setTargetCompatibility = compileOptions.javaClass.getMethod("setTargetCompatibility", JavaVersion::class.java)
+                setTargetCompatibility.invoke(compileOptions, JavaVersion.VERSION_17)
+            } catch (e: Exception) {
+                // Ignore
+            }
+            
+            try {
+                val setCompileSdkVersionMethod = android.javaClass.getMethod("setCompileSdkVersion", Int::class.javaPrimitiveType)
+                setCompileSdkVersionMethod.invoke(android, 36)
+            } catch (e: Exception) {
+                // Ignore
+            }
+        }
+    }
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile::class).configureEach {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
         }
     }
 }
