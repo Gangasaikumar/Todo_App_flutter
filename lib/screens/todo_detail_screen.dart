@@ -245,7 +245,10 @@ class _TodoDetailScreenState extends State<TodoDetailScreen> {
                                     listen: false,
                                   ).updateTodo(updatedTodo);
                                 },
-                                activeColor: Theme.of(context).primaryColor,
+                                activeColor: Theme.of(
+                                  context,
+                                ).colorScheme.primary,
+                                checkColor: Colors.black,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(4),
                                 ),

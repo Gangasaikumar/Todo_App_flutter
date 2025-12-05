@@ -144,7 +144,7 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
 
     // Colors
     final surfaceColor = Theme.of(context).cardColor;
-    final primaryColor = Theme.of(context).primaryColor;
+    final primaryColor = Theme.of(context).colorScheme.primary;
     final textColor = Theme.of(context).textTheme.bodyLarge?.color;
     final hintColor = Theme.of(context).hintColor;
     final borderColor = Theme.of(context).dividerColor;
@@ -243,6 +243,12 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
                           fontWeight: FontWeight.w500,
                           color: textColor,
                         ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter a title';
+                          }
+                          return null;
+                        },
                         decoration: InputDecoration(
                           hintText: 'What needs to be done?',
                           hintStyle: TextStyle(
@@ -267,14 +273,22 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
                               width: 2,
                             ),
                           ),
+                          errorBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Colors.red,
+                              width: 1.5,
+                            ),
+                          ),
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Colors.red,
+                              width: 2,
+                            ),
+                          ),
                           contentPadding: const EdgeInsets.all(16),
                         ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter a title';
-                          }
-                          return null;
-                        },
                       ),
 
                       const SizedBox(height: 24),
@@ -434,6 +448,13 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
                                                   controller:
                                                       textEditingController,
                                                   focusNode: focusNode,
+                                                  validator: (value) {
+                                                    if (value == null ||
+                                                        value.isEmpty) {
+                                                      return 'Required';
+                                                    }
+                                                    return null;
+                                                  },
                                                   onChanged: (value) {
                                                     setState(() {
                                                       _selectedCategory = value;
@@ -494,6 +515,30 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
                                                             color: primaryColor,
                                                             width: 2,
                                                           ),
+                                                        ),
+                                                    errorBorder: OutlineInputBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            20,
+                                                          ),
+                                                      borderSide:
+                                                          const BorderSide(
+                                                            color: Colors.red,
+                                                            width: 1.5,
+                                                          ),
+                                                    ),
+                                                    focusedErrorBorder:
+                                                        OutlineInputBorder(
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                20,
+                                                              ),
+                                                          borderSide:
+                                                              const BorderSide(
+                                                                color:
+                                                                    Colors.red,
+                                                                width: 2,
+                                                              ),
                                                         ),
                                                     suffixIcon: Icon(
                                                       Icons.arrow_drop_down,
@@ -1075,6 +1120,7 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
                               Expanded(
                                 child: TextField(
                                   controller: _subtaskController,
+                                  style: TextStyle(color: textColor),
                                   decoration: InputDecoration(
                                     hintText: 'Add a subtask...',
                                     hintStyle: TextStyle(
@@ -1088,6 +1134,13 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
                                       borderRadius: BorderRadius.circular(12),
                                       borderSide: BorderSide.none,
                                     ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(
+                                        color: primaryColor,
+                                        width: 2,
+                                      ),
+                                    ),
                                     contentPadding: const EdgeInsets.symmetric(
                                       horizontal: 16,
                                       vertical: 12,
@@ -1099,7 +1152,7 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
                               const SizedBox(width: 8),
                               IconButton(
                                 onPressed: _addSubtask,
-                                icon: const Icon(Icons.add),
+                                icon: Icon(Icons.add, color: primaryColor),
                                 style: IconButton.styleFrom(
                                   backgroundColor: primaryColor.withOpacity(
                                     0.1,

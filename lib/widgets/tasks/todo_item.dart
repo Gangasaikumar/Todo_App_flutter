@@ -84,7 +84,7 @@ class TodoItem extends StatelessWidget {
                       listen: false,
                     ).toggleTodoStatus(todo.id);
                   },
-                  activeColor: Theme.of(context).primaryColor,
+                  activeColor: Theme.of(context).colorScheme.primary,
                   checkColor: Colors.black,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(6),

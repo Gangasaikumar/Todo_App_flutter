@@ -27,7 +27,9 @@ class AppNotificationService {
       try {
         tz.setLocalLocation(tz.getLocation('Asia/Kolkata'));
       } catch (e) {
-        debugPrint('Could not set location to Asia/Kolkata, using UTC: $e');
+        if (kDebugMode) {
+          debugPrint('Could not set location to Asia/Kolkata, using UTC: $e');
+        }
         tz.setLocalLocation(tz.getLocation('UTC'));
       }
 
@@ -63,7 +65,9 @@ class AppNotificationService {
 
       _isInitialized = true;
     } catch (e) {
-      debugPrint('NotificationService init failed: $e');
+      if (kDebugMode) {
+        debugPrint('NotificationService init failed: $e');
+      }
     }
   }
 
@@ -168,11 +172,15 @@ class AppNotificationService {
       if (androidImplementation != null) {
         final bool? exactAlarmGranted = await androidImplementation
             .requestExactAlarmsPermission();
-        debugPrint('Exact Alarm Permission Granted: $exactAlarmGranted');
+        if (kDebugMode) {
+          debugPrint('Exact Alarm Permission Granted: $exactAlarmGranted');
+        }
         if (exactAlarmGranted == false) {
-          debugPrint(
-            'WARNING: Exact alarms not granted. Notification might be delayed or not shown.',
-          );
+          if (kDebugMode) {
+            debugPrint(
+              'WARNING: Exact alarms not granted. Notification might be delayed or not shown.',
+            );
+          }
         }
       }
 
@@ -201,9 +209,13 @@ class AppNotificationService {
         ),
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       );
-      debugPrint('✅ Notification scheduled successfully!');
+      if (kDebugMode) {
+        debugPrint('✅ Notification scheduled successfully!');
+      }
     } catch (e) {
-      debugPrint('❌ Error scheduling notification: $e');
+      if (kDebugMode) {
+        debugPrint('❌ Error scheduling notification: $e');
+      }
     }
   }
 

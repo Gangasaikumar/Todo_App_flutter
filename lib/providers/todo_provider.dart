@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/todo.dart';
 import '../models/category_model.dart';
@@ -124,7 +125,9 @@ class TodoProvider with ChangeNotifier {
         await _isarService.saveAllTodos(todos);
         await prefs.remove('todos');
       } catch (e) {
-        debugPrint('Error migrating todos: $e');
+        if (kDebugMode) {
+          debugPrint('Error migrating todos: $e');
+        }
       }
     }
 
@@ -139,7 +142,9 @@ class TodoProvider with ChangeNotifier {
         await _isarService.saveAllCategories(categories);
         await prefs.remove('categories');
       } catch (e) {
-        debugPrint('Error migrating categories: $e');
+        if (kDebugMode) {
+          debugPrint('Error migrating categories: $e');
+        }
       }
     }
   }
@@ -444,7 +449,9 @@ class TodoProvider with ChangeNotifier {
         todos: _todos,
       );
     } catch (e) {
-      debugPrint('Error fetching stats: $e');
+      if (kDebugMode) {
+        debugPrint('Error fetching stats: $e');
+      }
     } finally {
       _isLoadingStats = false;
       notifyListeners();
