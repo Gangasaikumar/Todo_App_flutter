@@ -10,8 +10,14 @@ import '../../screens/todo_detail_screen.dart';
 class TodoItem extends StatelessWidget {
   final Todo todo;
   final int index;
+  final bool isCompact;
 
-  const TodoItem({super.key, required this.todo, required this.index});
+  const TodoItem({
+    super.key,
+    required this.todo,
+    required this.index,
+    this.isCompact = false,
+  });
 
   String _getPlainText(String details) {
     if (details.isEmpty) return '';
@@ -29,7 +35,7 @@ class TodoItem extends StatelessWidget {
     return Dismissible(
       key: Key(todo.id),
       background: Container(
-        margin: const EdgeInsets.only(bottom: 12),
+        margin: EdgeInsets.only(bottom: isCompact ? 8 : 12),
         decoration: BoxDecoration(
           color: Colors.red,
           borderRadius: BorderRadius.circular(16),
@@ -52,8 +58,8 @@ class TodoItem extends StatelessWidget {
           );
         },
         child: Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          padding: const EdgeInsets.all(16),
+          margin: EdgeInsets.only(bottom: isCompact ? 8 : 12),
+          padding: EdgeInsets.all(isCompact ? 10 : 16),
           decoration: BoxDecoration(
             color: Theme.of(context).brightness == Brightness.dark
                 ? Colors.white.withAlpha(13) // 0.05 opacity
@@ -75,7 +81,7 @@ class TodoItem extends StatelessWidget {
             children: [
               // Custom Checkbox
               Transform.scale(
-                scale: 1.2,
+                scale: isCompact ? 1.0 : 1.2,
                 child: Checkbox(
                   value: todo.isCompleted,
                   onChanged: (value) {
@@ -92,7 +98,7 @@ class TodoItem extends StatelessWidget {
                   side: BorderSide(color: Colors.grey[400]!, width: 1.5),
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: isCompact ? 8 : 12),
               // Title and Category
               Expanded(
                 child: Column(
@@ -103,7 +109,7 @@ class TodoItem extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: isCompact ? 14 : 16,
                         fontWeight: FontWeight.w600,
                         decoration: todo.isCompleted
                             ? TextDecoration.lineThrough
@@ -116,103 +122,108 @@ class TodoItem extends StatelessWidget {
                       ),
                     ),
                     if (todo.details.isNotEmpty) ...[
-                      const SizedBox(height: 4),
+                      SizedBox(height: isCompact ? 2 : 4),
                       Text(
                         _getPlainText(todo.details),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                        style: TextStyle(
+                          fontSize: isCompact ? 11 : 12,
+                          color: Colors.grey[600],
+                        ),
                       ),
                     ],
-                    const SizedBox(height: 8),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Provider.of<TodoProvider>(context)
-                                .getCategoryColor(todo.category)
-                                .withAlpha(38), // 0.15 opacity
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            todo.category,
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              color: Provider.of<TodoProvider>(
-                                context,
-                              ).getCategoryColor(todo.category),
+                    SizedBox(height: isCompact ? 4 : 6),
+                    if (!isCompact || todo.details.isEmpty) ...[
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Provider.of<TodoProvider>(context)
+                                  .getCategoryColor(todo.category)
+                                  .withAlpha(38), // 0.15 opacity
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              todo.category,
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: Provider.of<TodoProvider>(
+                                  context,
+                                ).getCategoryColor(todo.category),
+                              ),
                             ),
                           ),
-                        ),
-                        if (todo.recurrence != RecurrenceInterval.none) ...[
-                          const SizedBox(width: 8),
-                          Icon(
-                            Icons.repeat_rounded,
-                            size: 16,
-                            color: Colors.grey[500],
-                          ),
-                        ],
-                        if (todo.subtasks.isNotEmpty) ...[
-                          const SizedBox(width: 8),
-                          Icon(
-                            Icons.checklist_rounded,
-                            size: 16,
-                            color: Colors.grey[500],
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            '${todo.subtasks.where((s) => s.isCompleted).length}/${todo.subtasks.length}',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey[600],
-                              fontWeight: FontWeight.w500,
+                          if (todo.recurrence != RecurrenceInterval.none) ...[
+                            const SizedBox(width: 8),
+                            Icon(
+                              Icons.repeat_rounded,
+                              size: 16,
+                              color: Colors.grey[500],
                             ),
-                          ),
-                        ],
-                        if (todo.estimatedPomodoros > 0) ...[
-                          const SizedBox(width: 8),
-                          const Text('🍅', style: TextStyle(fontSize: 14)),
-                          Text(
-                            ' ${todo.completedPomodoros}/${todo.estimatedPomodoros}',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color:
-                                  todo.completedPomodoros >=
-                                      todo.estimatedPomodoros
-                                  ? Colors.green
-                                  : Colors.grey[600],
-                              fontWeight: FontWeight.w500,
+                          ],
+                          if (todo.subtasks.isNotEmpty) ...[
+                            const SizedBox(width: 8),
+                            Icon(
+                              Icons.checklist_rounded,
+                              size: 16,
+                              color: Colors.grey[500],
                             ),
-                          ),
+                            const SizedBox(width: 4),
+                            Text(
+                              '${todo.subtasks.where((s) => s.isCompleted).length}/${todo.subtasks.length}',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey[600],
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                          if (todo.estimatedPomodoros > 0) ...[
+                            const SizedBox(width: 8),
+                            const Text('🍅', style: TextStyle(fontSize: 14)),
+                            Text(
+                              ' ${todo.completedPomodoros}/${todo.estimatedPomodoros}',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color:
+                                    todo.completedPomodoros >=
+                                        todo.estimatedPomodoros
+                                    ? Colors.green
+                                    : Colors.grey[600],
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
                         ],
-                      ],
-                    ),
+                      ),
+                    ],
                   ],
                 ),
               ),
               // Edit Button
-              IconButton(
-                icon: Icon(
-                  Icons.edit_outlined,
-                  size: 20,
-                  color: Colors.grey[400],
+              if (!isCompact)
+                IconButton(
+                  icon: Icon(
+                    Icons.edit_outlined,
+                    size: 20,
+                    color: Colors.grey[400],
+                  ),
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) =>
+                          AddTodoDialog(initialDate: todo.date, todo: todo),
+                    );
+                  },
                 ),
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) =>
-                        AddTodoDialog(initialDate: todo.date, todo: todo),
-                  );
-                },
-              ),
               // Drag Handle
-              if (index != -1)
+              if (index != -1 && !isCompact)
                 ReorderableDragStartListener(
                   index: index,
                   child: Container(

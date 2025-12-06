@@ -66,6 +66,13 @@ A premium, feature-rich Todo application built with Flutter. Designed with a foc
 - **Visual Progress**: A beautiful circular timer that visualizes your remaining time.
 - **Task Integration**: Start a focus session directly from any task's detail view.
 - **Gamification**: Track your daily focus progress against your goal.
+- **🎧 Soundscapes**: Immerse yourself with built-in ambient sounds:
+    - **Rain ☔**
+    - **Forest 🌲**
+    - **White Noise 🌊**
+    - **Cafe ☕**
+    - **Silence 🔇**
+- **Auto-Play**: Sounds automatically start when you focus and pause when you take a break.
 
 ### 10. 📊 Dashboard Analytics
 - **Productivity Insights**: Gain deep visibility into your work habits with the new Dashboard.
@@ -73,6 +80,12 @@ A premium, feature-rich Todo application built with Flutter. Designed with a foc
     - **Pending Work**: See estimated remaining effort based on your tasks' Pomodoro estimates.
     - **Daily Capacity**: Visual progress bar comparing today's focus time against your daily goal (e.g., 8 hours).
     - **Weekly Activity Chart**: A vertical bar chart visualizing your focus intensity over the last 7 days.
+
+### 11. 🗓️ Unified Calendar View
+- **Monthly Overview**: View your tasks on a full monthly calendar to plan ahead effectively.
+- **Unified Design**: Experience the **exact same** beautiful task list design as the Home Screen.
+- **Seamless Interaction**: Drag & drop to reorder, swipe to delete, and tap to edit directly from the calendar.
+- **Markers**: Visual dots indicate days with pending or completed tasks.
 
 ## 📱 Screenshots
 
@@ -142,9 +155,9 @@ A premium, feature-rich Todo application built with Flutter. Designed with a foc
 ## 📂 Project Structure
 
 - `lib/main.dart`: Entry point and Theme configuration.
-- `lib/providers/`: State management logic (`TodoProvider`, `ThemeProvider`).
+- `lib/providers/`: State management logic (`TodoProvider`, `ThemeProvider`, `FocusProvider`).
 - `lib/models/`: Data models (`Todo`, `CategoryModel`).
-- `lib/screens/`: App screens (`HomeScreen`, `SplashScreen`).
+- `lib/screens/`: App screens (`HomeScreen`, `CalendarScreen`, `FocusScreen`, `DashboardScreen`, `SettingsScreen`).
 - `lib/widgets/`: Reusable UI components.
     - `dialogs/`: `AddTodoDialog`, `AddCategoryDialog`.
     - `home/`: `DateTimeline`, `HomeHeader`, `TodoItem`, etc.

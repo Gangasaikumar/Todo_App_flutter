@@ -168,6 +168,9 @@ class _FocusScreenState extends State<FocusScreen> {
               ),
             ),
 
+            // Soundscape Selector
+            _buildSoundscapeSelector(context, focusProvider),
+
             // Controls
             Container(
               padding: const EdgeInsets.only(bottom: 50),
@@ -243,6 +246,88 @@ class _FocusScreenState extends State<FocusScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildSoundscapeSelector(
+    BuildContext context,
+    FocusProvider provider,
+  ) {
+    return Container(
+      height: 60,
+      margin: const EdgeInsets.only(bottom: 30),
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        children: Soundscape.values.map((sound) {
+          final isSelected = provider.selectedSoundscape == sound;
+          IconData icon;
+          String label;
+          switch (sound) {
+            case Soundscape.none:
+              icon = Icons.volume_off_rounded;
+              label = 'Silence';
+              break;
+            case Soundscape.rain:
+              icon = Icons.water_drop_rounded;
+              label = 'Rain';
+              break;
+            case Soundscape.forest:
+              icon = Icons.forest_rounded;
+              label = 'Forest';
+              break;
+            case Soundscape.whiteNoise:
+              icon = Icons.waves_rounded;
+              label = 'White Noise';
+              break;
+            case Soundscape.cafe:
+              icon = Icons.local_cafe_rounded;
+              label = 'Cafe';
+              break;
+          }
+
+          return GestureDetector(
+            onTap: () => provider.setSoundscape(sound),
+            child: Container(
+              margin: const EdgeInsets.only(right: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? Theme.of(context).colorScheme.primary.withOpacity(0.2)
+                    : Theme.of(context).cardColor,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: isSelected
+                      ? Theme.of(context).colorScheme.primary
+                      : Colors.transparent,
+                  width: 2,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    icon,
+                    size: 20,
+                    color: isSelected
+                        ? Theme.of(context).colorScheme.primary
+                        : Colors.grey,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    label,
+                    style: TextStyle(
+                      color: isSelected
+                          ? Theme.of(context).colorScheme.primary
+                          : Colors.grey,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }).toList(),
       ),
     );
   }

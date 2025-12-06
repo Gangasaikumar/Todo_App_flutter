@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/todo_provider.dart';
+import '../../screens/calendar_screen.dart';
 import '../../screens/dashboard_screen.dart';
 import '../../screens/settings_screen.dart';
 
@@ -49,20 +50,13 @@ class HeaderActions extends StatelessWidget {
                     ? Colors.white
                     : Colors.black,
               ),
-              onPressed: () async {
-                final DateTime? picked = await showDatePicker(
-                  context: context,
-                  initialDate: provider.selectedDate,
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime(2101),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CalendarScreen(),
+                  ),
                 );
-                if (picked != null && picked != provider.selectedDate) {
-                  provider.selectDate(picked);
-                  // If we were showing all tasks, switch back to single date view
-                  if (showAllTasks) {
-                    onShowAllTasksChanged();
-                  }
-                }
               },
             ),
             if (!showAllTasks) ...[],

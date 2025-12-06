@@ -8,9 +8,12 @@ enum FocusMode { work, shortBreak, longBreak }
 
 enum TimerState { initial, running, paused }
 
+enum Soundscape { none, rain, forest, whiteNoise, cafe }
+
 class FocusProvider with ChangeNotifier {
   Timer? _timer;
   final AudioPlayer _audioPlayer = AudioPlayer();
+  final AudioPlayer _backgroundPlayer = AudioPlayer();
   final AppNotificationService _notificationService = AppNotificationService();
 
   // Settings
@@ -21,11 +24,13 @@ class FocusProvider with ChangeNotifier {
   // State
   FocusMode _mode = FocusMode.work;
   TimerState _timerState = TimerState.initial;
+  Soundscape _selectedSoundscape = Soundscape.none; // Sound State
   int _currentDuration = 30 * 60;
   int _initialDuration = 30 * 60;
 
   FocusMode get mode => _mode;
   TimerState get timerState => _timerState;
+  Soundscape get selectedSoundscape => _selectedSoundscape;
   int get currentDuration => _currentDuration;
   int get initialDuration => _initialDuration;
 
@@ -104,11 +109,66 @@ class FocusProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  // --- Soundscape Logic ---
+
+  void setSoundscape(Soundscape sound) {
+    _selectedSoundscape = sound;
+    notifyListeners();
+    // If running, switch sound immediately
+    if (_timerState == TimerState.running) {
+      _playBackgroundSound();
+    }
+  }
+
+  Future<void> _playBackgroundSound() async {
+    if (_selectedSoundscape == Soundscape.none) {
+      await _backgroundPlayer.stop();
+      return;
+    }
+
+    final filename = _getSoundFilename(_selectedSoundscape);
+    if (filename == null) return;
+
+    try {
+      await _backgroundPlayer.setReleaseMode(ReleaseMode.loop);
+      // Wait a bit to ensure clean switch if swiping fast
+      await _backgroundPlayer.stop();
+      await _backgroundPlayer.play(AssetSource(filename));
+    } catch (e) {
+      debugPrint('Error playing background sound: $e');
+    }
+  }
+
+  Future<void> _stopBackgroundSound() async {
+    try {
+      await _backgroundPlayer.stop();
+    } catch (e) {
+      debugPrint('Error stopping background sound: $e');
+    }
+  }
+
+  String? _getSoundFilename(Soundscape sound) {
+    switch (sound) {
+      case Soundscape.rain:
+        return 'sounds/rain.mp3';
+      case Soundscape.forest:
+        return 'sounds/forest.mp3';
+      case Soundscape.whiteNoise:
+        return 'sounds/white_noise.mp3';
+      case Soundscape.cafe:
+        return 'sounds/cafe.mp3';
+      default:
+        return null; // None
+    }
+  }
+
   void startTimer() {
     if (_timerState == TimerState.running) return;
 
     _timerState = TimerState.running;
     notifyListeners();
+
+    _playBackgroundSound(); // Start sound
 
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_currentDuration > 0) {
@@ -124,11 +184,13 @@ class FocusProvider with ChangeNotifier {
     if (_timerState != TimerState.running) return;
     _timer?.cancel();
     _timerState = TimerState.paused;
+    _stopBackgroundSound();
     notifyListeners();
   }
 
   void stopTimer() {
     _stopTimerInternal();
+    _stopBackgroundSound();
     // Reset to initial of current mode
     switch (_mode) {
       case FocusMode.work:
@@ -180,6 +242,7 @@ class FocusProvider with ChangeNotifier {
   void dispose() {
     _timer?.cancel();
     _audioPlayer.dispose();
+    _backgroundPlayer.dispose();
     super.dispose();
   }
 }

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import '../providers/todo_provider.dart';
+import '../repositories/dashboard_repository.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -62,6 +63,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 children: [
                   _buildDateRangeHeader(context, todoProvider, textColor),
                   const SizedBox(height: 24),
+                  _buildGamificationHeader(context, stats), // New
+                  const SizedBox(height: 24),
                   Text(
                     'Overview',
                     style: TextStyle(
@@ -114,6 +117,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           _formatDuration(stats.totalFocusMinutes),
                           Colors.purpleAccent,
                           Icons.timer,
+                          diffValue:
+                              stats.comparisonStats != null &&
+                                  stats.comparisonStats!.totalFocusMinutes > 0
+                              ? (((stats.totalFocusMinutes -
+                                                stats
+                                                    .comparisonStats!
+                                                    .totalFocusMinutes) /
+                                            stats
+                                                .comparisonStats!
+                                                .totalFocusMinutes) *
+                                        100)
+                                    .toInt()
+                              : null,
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -206,7 +222,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Categories',
+                          'Focus Distribution',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -218,7 +234,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           height: 200,
                           child: _buildCategoryPieChart(
                             context,
-                            stats.categoryStats,
+                            stats.categoryFocusMinutes,
                             todoProvider,
                           ),
                         ),
@@ -300,8 +316,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     String title,
     String value,
     Color color,
-    IconData icon,
-  ) {
+    IconData icon, {
+    int? diffValue,
+  }) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -318,7 +335,45 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: color, size: 28),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Icon(icon, color: color, size: 28),
+              if (diffValue != null && diffValue != 0)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: diffValue > 0
+                        ? Colors.green.withOpacity(0.1)
+                        : Colors.red.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        diffValue > 0
+                            ? Icons.arrow_upward
+                            : Icons.arrow_downward,
+                        size: 12,
+                        color: diffValue > 0 ? Colors.green : Colors.red,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${diffValue > 0 ? '+' : ''}$diffValue%',
+                        style: TextStyle(
+                          color: diffValue > 0 ? Colors.green : Colors.red,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
           const SizedBox(height: 12),
           Text(
             value,
@@ -554,6 +609,215 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
+  Widget _buildGamificationHeader(BuildContext context, DashboardStats stats) {
+    final String rank = _getRankName(stats.currentLevel);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.purple.shade400, Colors.deepPurple.shade700],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.deepPurple.withOpacity(0.3),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.emoji_events,
+                  color: Colors.amber,
+                  size: 32,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Level ${stats.currentLevel}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                  Text(
+                    rank,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
+                  ),
+                ],
+              ),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.black26,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  '${stats.totalXP} XP',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Progress to Lvl ${stats.currentLevel + 1}',
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.8),
+                      fontSize: 12,
+                    ),
+                  ),
+                  Text(
+                    '${stats.currentLevelProgress.toInt()} / 100 XP',
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.8),
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: LinearProgressIndicator(
+                  value: stats.currentLevelProgress / 100,
+                  backgroundColor: Colors.black26,
+                  valueColor: const AlwaysStoppedAnimation<Color>(Colors.amber),
+                  minHeight: 8,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _getRankName(int level) {
+    if (level < 5) return 'Novice Focus';
+    if (level < 10) return 'Productivity Pro';
+    if (level < 20) return 'Task Master';
+    if (level < 50) return 'Grandmaster';
+    return 'Legendary';
+  }
+
+  void _showDailyTasks(
+    BuildContext context,
+    DateTime date,
+    TodoProvider provider,
+  ) {
+    final todos = provider.todos
+        .where(
+          (t) =>
+              t.date.year == date.year &&
+              t.date.month == date.month &&
+              t.date.day == date.day,
+        )
+        .toList();
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                DateFormat('MMMM d, yyyy').format(date),
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              if (todos.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 24),
+                  child: Center(child: Text('No tasks recorded for this day.')),
+                )
+              else
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: todos.length,
+                    itemBuilder: (context, index) {
+                      final todo = todos[index];
+                      return ListTile(
+                        leading: Icon(
+                          todo.isCompleted
+                              ? Icons.check_circle
+                              : Icons.circle_outlined,
+                          color: todo.isCompleted ? Colors.green : Colors.grey,
+                        ),
+                        title: Text(
+                          todo.title,
+                          style: TextStyle(
+                            decoration: todo.isCompleted
+                                ? TextDecoration.lineThrough
+                                : null,
+                          ),
+                        ),
+                        subtitle: Text(
+                          '${todo.completedPomodoros * 30} mins focus',
+                        ),
+                        trailing: Container(
+                          width: 12,
+                          height: 12,
+                          decoration: BoxDecoration(
+                            color: provider.getCategoryColor(todo.category),
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildCategoryPieChart(
     BuildContext context,
     Map<String, int> stats,
@@ -625,7 +889,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                     ),
                     Text(
-                      '${entry.value}',
+                      _formatDuration(entry.value),
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
@@ -668,6 +932,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
         maxY: maxY,
         barTouchData: BarTouchData(
           enabled: true,
+          touchCallback: (FlTouchEvent event, barTouchResponse) {
+            if (!event.isInterestedForInteractions ||
+                barTouchResponse == null ||
+                barTouchResponse.spot == null) {
+              return;
+            }
+            if (event is FlTapUpEvent) {
+              final index = barTouchResponse.spot!.touchedBarGroupIndex;
+              final date = endDate.subtract(Duration(days: 6 - index));
+              _showDailyTasks(
+                context,
+                date,
+                Provider.of<TodoProvider>(context, listen: false),
+              );
+            }
+          },
           touchTooltipData: BarTouchTooltipData(
             getTooltipColor: (group) => Theme.of(context).cardColor,
             tooltipBorder: BorderSide(
@@ -680,7 +960,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               if (index >= weeklyMinutes.length) return null;
               final val = weeklyMinutes[index];
               return BarTooltipItem(
-                '${_formatDuration(val)}',
+                _formatDuration(val),
                 TextStyle(
                   color: Theme.of(context).textTheme.bodyLarge?.color,
                   fontWeight: FontWeight.bold,
