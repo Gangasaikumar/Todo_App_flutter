@@ -67,6 +67,13 @@ A premium, feature-rich Todo application built with Flutter. Designed with a foc
 - **Task Integration**: Start a focus session directly from any task's detail view.
 - **Gamification**: Track your daily focus progress against your goal.
 
+### 10. 📊 Dashboard Analytics
+- **Productivity Insights**: Gain deep visibility into your work habits with the new Dashboard.
+    - **Total Focus Time**: Track your cumulative time spent in deep work.
+    - **Pending Work**: See estimated remaining effort based on your tasks' Pomodoro estimates.
+    - **Daily Capacity**: Visual progress bar comparing today's focus time against your daily goal (e.g., 8 hours).
+    - **Weekly Activity Chart**: A vertical bar chart visualizing your focus intensity over the last 7 days.
+
 ## 📱 Screenshots
 
 ### 🚀 Splash Screen

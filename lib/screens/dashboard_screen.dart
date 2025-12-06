@@ -104,6 +104,36 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildSummaryCard(
+                          context,
+                          'Total Focus Time',
+                          _formatDuration(stats.totalFocusMinutes),
+                          Colors.purpleAccent,
+                          Icons.timer,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildCapacityCard(
+                          context,
+                          stats.todayFocusMinutes,
+                          todoProvider.dailyGoalHours,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  _buildSummaryCard(
+                    context,
+                    'Pending Focus',
+                    _formatDuration(stats.pendingFocusMinutes),
+                    Colors.orangeAccent,
+                    Icons.hourglass_empty,
+                  ),
                   const SizedBox(height: 32),
                   Container(
                     padding: const EdgeInsets.all(16),
@@ -195,6 +225,44 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ],
                     ),
                   ),
+
+                  const SizedBox(height: 32),
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Focus Activity',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: textColor,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        SizedBox(
+                          height: 200,
+                          child: _buildFocusBarChart(
+                            context,
+                            stats.weeklyFocusMinutes,
+                            todoProvider.dashboardEndDate,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -269,6 +337,70 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 context,
               ).textTheme.bodyMedium?.color?.withOpacity(0.7),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCapacityCard(
+    BuildContext context,
+    int currentMinutes,
+    int goalHours,
+  ) {
+    final goalMinutes = goalHours * 60;
+    final double progress = goalMinutes > 0
+        ? (currentMinutes / goalMinutes).clamp(0.0, 1.0)
+        : 0.0;
+    final currentHours = (currentMinutes / 60).toStringAsFixed(1);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Icon(Icons.battery_charging_full, color: Colors.blueAccent),
+              Text(
+                '${(progress * 100).toInt()}%',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Daily Capacity',
+            style: TextStyle(
+              fontSize: 14,
+              color: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.color?.withOpacity(0.7),
+            ),
+          ),
+          const SizedBox(height: 8),
+          LinearProgressIndicator(
+            value: progress,
+            backgroundColor: Colors.grey.withOpacity(0.2),
+            valueColor: const AlwaysStoppedAnimation<Color>(Colors.blueAccent),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '$currentHours / $goalHours h',
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ],
       ),
@@ -506,6 +638,115 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  String _formatDuration(int totalMinutes) {
+    if (totalMinutes == 0) return '0m';
+    final hours = totalMinutes ~/ 60;
+    final minutes = totalMinutes % 60;
+    if (hours > 0) {
+      return '${hours}h ${minutes}m';
+    }
+    return '${minutes}m';
+  }
+
+  Widget _buildFocusBarChart(
+    BuildContext context,
+    List<int> weeklyMinutes,
+    DateTime endDate,
+  ) {
+    double maxVal = 0;
+    for (var m in weeklyMinutes) {
+      if (m > maxVal) maxVal = m.toDouble();
+    }
+    final double maxY = (maxVal > 0 ? maxVal + 30 : 60.0).toDouble();
+
+    return BarChart(
+      BarChartData(
+        alignment: BarChartAlignment.spaceAround,
+        maxY: maxY,
+        barTouchData: BarTouchData(
+          enabled: true,
+          touchTooltipData: BarTouchTooltipData(
+            getTooltipColor: (group) => Theme.of(context).cardColor,
+            tooltipBorder: BorderSide(
+              color: Theme.of(context).dividerColor.withOpacity(0.2),
+            ),
+            tooltipBorderRadius: BorderRadius.circular(16),
+            tooltipPadding: const EdgeInsets.all(8),
+            getTooltipItem: (group, groupIndex, rod, rodIndex) {
+              final index = group.x.toInt();
+              if (index >= weeklyMinutes.length) return null;
+              final val = weeklyMinutes[index];
+              return BarTooltipItem(
+                '${_formatDuration(val)}',
+                TextStyle(
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
+                  fontWeight: FontWeight.bold,
+                ),
+              );
+            },
+          ),
+        ),
+        titlesData: FlTitlesData(
+          show: true,
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              getTitlesWidget: (double value, TitleMeta meta) {
+                final index = value.toInt();
+                if (index < 0 || index >= 7) return const SizedBox.shrink();
+                final date = endDate.subtract(Duration(days: 6 - index));
+                return Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Text(
+                    DateFormat('E').format(date),
+                    style: TextStyle(
+                      color: Theme.of(context).textTheme.bodySmall?.color,
+                      fontSize: 12,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          leftTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          topTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          rightTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+        ),
+        gridData: FlGridData(show: false),
+        borderData: FlBorderData(show: false),
+        barGroups: List.generate(7, (index) {
+          final minutes = index < weeklyMinutes.length
+              ? weeklyMinutes[index].toDouble()
+              : 0.0;
+          return BarChartGroupData(
+            x: index,
+            barRods: [
+              BarChartRodData(
+                toY: minutes,
+                color: Colors.purpleAccent,
+                width: 16,
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(6),
+                ),
+                backDrawRodData: BackgroundBarChartRodData(
+                  show: true,
+                  toY: maxY,
+                  color: Theme.of(context).dividerColor.withOpacity(0.05),
+                ),
+              ),
+            ],
+          );
+        }),
+      ),
     );
   }
 }
