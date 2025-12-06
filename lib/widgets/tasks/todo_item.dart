@@ -175,6 +175,22 @@ class TodoItem extends StatelessWidget {
                             ),
                           ),
                         ],
+                        if (todo.estimatedPomodoros > 0) ...[
+                          const SizedBox(width: 8),
+                          const Text('🍅', style: TextStyle(fontSize: 14)),
+                          Text(
+                            ' ${todo.completedPomodoros}/${todo.estimatedPomodoros}',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color:
+                                  todo.completedPomodoros >=
+                                      todo.estimatedPomodoros
+                                  ? Colors.green
+                                  : Colors.grey[600],
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ],

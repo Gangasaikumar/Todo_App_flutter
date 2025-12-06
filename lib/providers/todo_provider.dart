@@ -43,6 +43,7 @@ class TodoProvider with ChangeNotifier {
     await loadTodos();
     await loadCategories();
     await _loadSoundSetting();
+    await _loadFocusSettings();
     await _calculateStreak();
   }
 
@@ -225,6 +226,64 @@ class TodoProvider with ChangeNotifier {
     return sortedMap;
   }
 
+  // --- Pomodoro Capacity Logic ---
+
+  // --- Pomodoro Capacity & Settings Logic ---
+
+  int _focusDurationMinutes = 30;
+  int _dailyGoalHours = 8;
+
+  int get focusDurationMinutes => _focusDurationMinutes;
+  int get dailyGoalHours => _dailyGoalHours;
+
+  int get dailyPomodoroCapacity =>
+      (_dailyGoalHours * 60) ~/ _focusDurationMinutes;
+
+  int getDailyPomoUsage(DateTime date) {
+    final todosForDate = _todos.where((t) => isSameDate(t.date, date)).toList();
+    int total = 0;
+    for (var t in todosForDate) {
+      total += t.estimatedPomodoros;
+    }
+    return total;
+  }
+
+  int get remainingDailyCapacity {
+    return dailyPomodoroCapacity - getDailyPomoUsage(_selectedDate);
+  }
+
+  bool canAddPomodoros(DateTime date, int amount) {
+    final currentUsage = getDailyPomoUsage(date);
+    return (currentUsage + amount) <= dailyPomodoroCapacity;
+  }
+
+  Future<void> _loadFocusSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    _focusDurationMinutes = prefs.getInt('focusDurationMinutes') ?? 30;
+    _dailyGoalHours = prefs.getInt('dailyGoalHours') ?? 8;
+    notifyListeners();
+  }
+
+  Future<void> updateFocusSettings(int durationMinutes, int hours) async {
+    _focusDurationMinutes = durationMinutes;
+    _dailyGoalHours = hours;
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('focusDurationMinutes', durationMinutes);
+    await prefs.setInt('dailyGoalHours', hours);
+    notifyListeners();
+  }
+
+  Future<void> incrementCompletedPomodoros(String todoId) async {
+    final index = _todos.indexWhere((t) => t.id == todoId);
+    if (index != -1) {
+      final todo = _todos[index];
+      todo.completedPomodoros = (todo.completedPomodoros) + 1;
+      await _isarService.saveTodo(todo);
+      notifyListeners();
+    }
+  }
+
   Future<void> _migrateFromSharedPreferences() async {
     // Migration logic placeholder
   }
@@ -247,6 +306,7 @@ class TodoProvider with ChangeNotifier {
     DateTime? reminderDateTime, [
     RecurrenceInterval recurrence = RecurrenceInterval.none,
     List<Subtask> subtasks = const [],
+    int estimatedPomodoros = 0,
   ]) async {
     final newTodo = Todo(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -257,6 +317,7 @@ class TodoProvider with ChangeNotifier {
       reminderDateTime: reminderDateTime,
       recurrence: recurrence,
       subtasks: subtasks,
+      estimatedPomodoros: estimatedPomodoros,
     );
 
     await _isarService.saveTodo(newTodo);

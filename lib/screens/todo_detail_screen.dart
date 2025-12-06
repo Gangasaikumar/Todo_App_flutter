@@ -6,6 +6,7 @@ import 'package:flutter_quill/flutter_quill.dart';
 import '../../providers/todo_provider.dart';
 import '../../models/todo.dart';
 import '../widgets/dialogs/add_todo_dialog.dart';
+import 'focus_screen.dart';
 
 class TodoDetailScreen extends StatefulWidget {
   final String todoId;
@@ -140,6 +141,20 @@ class _TodoDetailScreenState extends State<TodoDetailScreen> {
                           ),
                         ],
                       ),
+                      const Spacer(),
+                      IconButton(
+                        icon: const Icon(Icons.timer_outlined, size: 24),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  FocusScreen(taskTitle: todo.title),
+                            ),
+                          );
+                        },
+                        tooltip: 'Start Focus Session',
+                      ),
                     ],
                   ),
                   const SizedBox(height: 20),
@@ -180,6 +195,80 @@ class _TodoDetailScreenState extends State<TodoDetailScreen> {
                       ],
                     ),
                   ],
+
+                  // Focus Progress
+                  if (todo.estimatedPomodoros > 0) ...[
+                    const SizedBox(height: 32),
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.primaryContainer.withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.timer,
+                            size: 28,
+                            color: Colors.orange,
+                          ),
+                          const SizedBox(width: 16),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Focus Progress',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: subTextColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                '${todo.completedPomodoros} / ${todo.estimatedPomodoros} sessions',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: textColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const Spacer(),
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => FocusScreen(
+                                    taskTitle: todo.title,
+                                    todoId: todo.id,
+                                  ),
+                                ),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  Colors.black, // Requested Black BG
+                              foregroundColor: const Color(
+                                0xFFFFE082,
+                              ), // Request Yellow Text
+                              shape: const StadiumBorder(),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
+                            ),
+                            child: const Text('Start'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+
                   const SizedBox(height: 32),
 
                   // Details

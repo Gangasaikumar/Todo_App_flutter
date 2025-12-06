@@ -22,45 +22,55 @@ const TodoSchema = CollectionSchema(
       name: r'category',
       type: IsarType.string,
     ),
-    r'date': PropertySchema(
+    r'completedPomodoros': PropertySchema(
       id: 1,
+      name: r'completedPomodoros',
+      type: IsarType.long,
+    ),
+    r'date': PropertySchema(
+      id: 2,
       name: r'date',
       type: IsarType.dateTime,
     ),
     r'details': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'details',
       type: IsarType.string,
     ),
+    r'estimatedPomodoros': PropertySchema(
+      id: 4,
+      name: r'estimatedPomodoros',
+      type: IsarType.long,
+    ),
     r'id': PropertySchema(
-      id: 3,
+      id: 5,
       name: r'id',
       type: IsarType.string,
     ),
     r'isCompleted': PropertySchema(
-      id: 4,
+      id: 6,
       name: r'isCompleted',
       type: IsarType.bool,
     ),
     r'recurrence': PropertySchema(
-      id: 5,
+      id: 7,
       name: r'recurrence',
       type: IsarType.string,
       enumMap: _TodorecurrenceEnumValueMap,
     ),
     r'reminderDateTime': PropertySchema(
-      id: 6,
+      id: 8,
       name: r'reminderDateTime',
       type: IsarType.dateTime,
     ),
     r'subtasks': PropertySchema(
-      id: 7,
+      id: 9,
       name: r'subtasks',
       type: IsarType.objectList,
       target: r'Subtask',
     ),
     r'title': PropertySchema(
-      id: 8,
+      id: 10,
       name: r'title',
       type: IsarType.string,
     )
@@ -122,19 +132,21 @@ void _todoSerialize(
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeString(offsets[0], object.category);
-  writer.writeDateTime(offsets[1], object.date);
-  writer.writeString(offsets[2], object.details);
-  writer.writeString(offsets[3], object.id);
-  writer.writeBool(offsets[4], object.isCompleted);
-  writer.writeString(offsets[5], object.recurrence.name);
-  writer.writeDateTime(offsets[6], object.reminderDateTime);
+  writer.writeLong(offsets[1], object.completedPomodoros);
+  writer.writeDateTime(offsets[2], object.date);
+  writer.writeString(offsets[3], object.details);
+  writer.writeLong(offsets[4], object.estimatedPomodoros);
+  writer.writeString(offsets[5], object.id);
+  writer.writeBool(offsets[6], object.isCompleted);
+  writer.writeString(offsets[7], object.recurrence.name);
+  writer.writeDateTime(offsets[8], object.reminderDateTime);
   writer.writeObjectList<Subtask>(
-    offsets[7],
+    offsets[9],
     allOffsets,
     SubtaskSchema.serialize,
     object.subtasks,
   );
-  writer.writeString(offsets[8], object.title);
+  writer.writeString(offsets[10], object.title);
 }
 
 Todo _todoDeserialize(
@@ -145,22 +157,24 @@ Todo _todoDeserialize(
 ) {
   final object = Todo(
     category: reader.readStringOrNull(offsets[0]) ?? 'Personal',
-    date: reader.readDateTime(offsets[1]),
-    details: reader.readStringOrNull(offsets[2]) ?? '',
-    id: reader.readString(offsets[3]),
-    isCompleted: reader.readBoolOrNull(offsets[4]) ?? false,
+    completedPomodoros: reader.readLongOrNull(offsets[1]) ?? 0,
+    date: reader.readDateTime(offsets[2]),
+    details: reader.readStringOrNull(offsets[3]) ?? '',
+    estimatedPomodoros: reader.readLongOrNull(offsets[4]) ?? 0,
+    id: reader.readString(offsets[5]),
+    isCompleted: reader.readBoolOrNull(offsets[6]) ?? false,
     recurrence:
-        _TodorecurrenceValueEnumMap[reader.readStringOrNull(offsets[5])] ??
+        _TodorecurrenceValueEnumMap[reader.readStringOrNull(offsets[7])] ??
             RecurrenceInterval.none,
-    reminderDateTime: reader.readDateTimeOrNull(offsets[6]),
+    reminderDateTime: reader.readDateTimeOrNull(offsets[8]),
     subtasks: reader.readObjectList<Subtask>(
-          offsets[7],
+          offsets[9],
           SubtaskSchema.deserialize,
           allOffsets,
           Subtask(),
         ) ??
         const [],
-    title: reader.readString(offsets[8]),
+    title: reader.readString(offsets[10]),
   );
   object.isarId = id;
   return object;
@@ -176,19 +190,23 @@ P _todoDeserializeProp<P>(
     case 0:
       return (reader.readStringOrNull(offset) ?? 'Personal') as P;
     case 1:
-      return (reader.readDateTime(offset)) as P;
+      return (reader.readLongOrNull(offset) ?? 0) as P;
     case 2:
-      return (reader.readStringOrNull(offset) ?? '') as P;
+      return (reader.readDateTime(offset)) as P;
     case 3:
-      return (reader.readString(offset)) as P;
+      return (reader.readStringOrNull(offset) ?? '') as P;
     case 4:
-      return (reader.readBoolOrNull(offset) ?? false) as P;
+      return (reader.readLongOrNull(offset) ?? 0) as P;
     case 5:
+      return (reader.readString(offset)) as P;
+    case 6:
+      return (reader.readBoolOrNull(offset) ?? false) as P;
+    case 7:
       return (_TodorecurrenceValueEnumMap[reader.readStringOrNull(offset)] ??
           RecurrenceInterval.none) as P;
-    case 6:
+    case 8:
       return (reader.readDateTimeOrNull(offset)) as P;
-    case 7:
+    case 9:
       return (reader.readObjectList<Subtask>(
             offset,
             SubtaskSchema.deserialize,
@@ -196,7 +214,7 @@ P _todoDeserializeProp<P>(
             Subtask(),
           ) ??
           const []) as P;
-    case 8:
+    case 10:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -530,6 +548,59 @@ extension TodoQueryFilter on QueryBuilder<Todo, Todo, QFilterCondition> {
     });
   }
 
+  QueryBuilder<Todo, Todo, QAfterFilterCondition> completedPomodorosEqualTo(
+      int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'completedPomodoros',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Todo, Todo, QAfterFilterCondition> completedPomodorosGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'completedPomodoros',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Todo, Todo, QAfterFilterCondition> completedPomodorosLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'completedPomodoros',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Todo, Todo, QAfterFilterCondition> completedPomodorosBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'completedPomodoros',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
   QueryBuilder<Todo, Todo, QAfterFilterCondition> dateEqualTo(DateTime value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -706,6 +777,59 @@ extension TodoQueryFilter on QueryBuilder<Todo, Todo, QFilterCondition> {
       return query.addFilterCondition(FilterCondition.greaterThan(
         property: r'details',
         value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Todo, Todo, QAfterFilterCondition> estimatedPomodorosEqualTo(
+      int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'estimatedPomodoros',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Todo, Todo, QAfterFilterCondition> estimatedPomodorosGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'estimatedPomodoros',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Todo, Todo, QAfterFilterCondition> estimatedPomodorosLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'estimatedPomodoros',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Todo, Todo, QAfterFilterCondition> estimatedPomodorosBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'estimatedPomodoros',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
       ));
     });
   }
@@ -1336,6 +1460,18 @@ extension TodoQuerySortBy on QueryBuilder<Todo, Todo, QSortBy> {
     });
   }
 
+  QueryBuilder<Todo, Todo, QAfterSortBy> sortByCompletedPomodoros() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'completedPomodoros', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Todo, Todo, QAfterSortBy> sortByCompletedPomodorosDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'completedPomodoros', Sort.desc);
+    });
+  }
+
   QueryBuilder<Todo, Todo, QAfterSortBy> sortByDate() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'date', Sort.asc);
@@ -1357,6 +1493,18 @@ extension TodoQuerySortBy on QueryBuilder<Todo, Todo, QSortBy> {
   QueryBuilder<Todo, Todo, QAfterSortBy> sortByDetailsDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'details', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Todo, Todo, QAfterSortBy> sortByEstimatedPomodoros() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'estimatedPomodoros', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Todo, Todo, QAfterSortBy> sortByEstimatedPomodorosDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'estimatedPomodoros', Sort.desc);
     });
   }
 
@@ -1434,6 +1582,18 @@ extension TodoQuerySortThenBy on QueryBuilder<Todo, Todo, QSortThenBy> {
     });
   }
 
+  QueryBuilder<Todo, Todo, QAfterSortBy> thenByCompletedPomodoros() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'completedPomodoros', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Todo, Todo, QAfterSortBy> thenByCompletedPomodorosDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'completedPomodoros', Sort.desc);
+    });
+  }
+
   QueryBuilder<Todo, Todo, QAfterSortBy> thenByDate() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'date', Sort.asc);
@@ -1455,6 +1615,18 @@ extension TodoQuerySortThenBy on QueryBuilder<Todo, Todo, QSortThenBy> {
   QueryBuilder<Todo, Todo, QAfterSortBy> thenByDetailsDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'details', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Todo, Todo, QAfterSortBy> thenByEstimatedPomodoros() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'estimatedPomodoros', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Todo, Todo, QAfterSortBy> thenByEstimatedPomodorosDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'estimatedPomodoros', Sort.desc);
     });
   }
 
@@ -1539,6 +1711,12 @@ extension TodoQueryWhereDistinct on QueryBuilder<Todo, Todo, QDistinct> {
     });
   }
 
+  QueryBuilder<Todo, Todo, QDistinct> distinctByCompletedPomodoros() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'completedPomodoros');
+    });
+  }
+
   QueryBuilder<Todo, Todo, QDistinct> distinctByDate() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'date');
@@ -1549,6 +1727,12 @@ extension TodoQueryWhereDistinct on QueryBuilder<Todo, Todo, QDistinct> {
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'details', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<Todo, Todo, QDistinct> distinctByEstimatedPomodoros() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'estimatedPomodoros');
     });
   }
 
@@ -1599,6 +1783,12 @@ extension TodoQueryProperty on QueryBuilder<Todo, Todo, QQueryProperty> {
     });
   }
 
+  QueryBuilder<Todo, int, QQueryOperations> completedPomodorosProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'completedPomodoros');
+    });
+  }
+
   QueryBuilder<Todo, DateTime, QQueryOperations> dateProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'date');
@@ -1608,6 +1798,12 @@ extension TodoQueryProperty on QueryBuilder<Todo, Todo, QQueryProperty> {
   QueryBuilder<Todo, String, QQueryOperations> detailsProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'details');
+    });
+  }
+
+  QueryBuilder<Todo, int, QQueryOperations> estimatedPomodorosProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'estimatedPomodoros');
     });
   }
 

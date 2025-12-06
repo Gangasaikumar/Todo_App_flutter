@@ -43,6 +43,9 @@ class Todo {
 
   List<Subtask> subtasks;
 
+  int estimatedPomodoros;
+  int completedPomodoros;
+
   Todo({
     required this.id,
     required this.title,
@@ -53,6 +56,8 @@ class Todo {
     this.reminderDateTime,
     this.recurrence = RecurrenceInterval.none,
     this.subtasks = const [],
+    this.estimatedPomodoros = 0,
+    this.completedPomodoros = 0,
   });
 
   factory Todo.fromJson(Map<String, dynamic> json) {
@@ -77,6 +82,8 @@ class Todo {
       subtasks: json['subtasks'] != null
           ? (json['subtasks'] as List).map((e) => Subtask.fromJson(e)).toList()
           : [],
+      estimatedPomodoros: json['estimatedPomodoros'] ?? 0,
+      completedPomodoros: json['completedPomodoros'] ?? 0,
     );
   }
 
@@ -91,6 +98,8 @@ class Todo {
       'reminderDateTime': reminderDateTime?.toIso8601String(),
       'recurrence': recurrence.name,
       'subtasks': subtasks.map((e) => e.toJson()).toList(),
+      'estimatedPomodoros': estimatedPomodoros,
+      'completedPomodoros': completedPomodoros,
     };
   }
 }

@@ -5,12 +5,12 @@ class AppTheme {
     useMaterial3: true,
     brightness: Brightness.light,
     colorScheme: ColorScheme.fromSeed(
-      seedColor: const Color(0xFFFBCB57), // Yellow
-      primary: const Color(0xFFFBCB57),
-      secondary: const Color(0xFFF57F17), // Darker yellow/orange for secondary
+      seedColor: const Color(0xFFFFE082), // Pastel Yellow
+      primary: const Color(0xFFFFE082),
+      secondary: const Color(0xFFFFCC80), // Pastel Orange
       surface: Colors.white,
-      onPrimary: Colors.white,
-      onSecondary: Colors.white,
+      onPrimary: Colors.black, // Dark text on light pastel yellow for contrast
+      onSecondary: Colors.black,
       onSurface: Colors.black87,
     ),
     scaffoldBackgroundColor: const Color(0xFFF5F5FA),
@@ -22,15 +22,15 @@ class AppTheme {
       color: Colors.white,
     ),
     appBarTheme: const AppBarTheme(
-      backgroundColor: Color(0xFFFBCB57),
-      foregroundColor: Colors.white,
+      backgroundColor: Color(0xFFFFE082),
+      foregroundColor: Colors.black, // Dark text on light bar
       elevation: 0,
     ),
     datePickerTheme: DatePickerThemeData(
       backgroundColor: Colors.white,
       surfaceTintColor: Colors.transparent,
-      headerBackgroundColor: const Color(0xFFFBCB57),
-      headerForegroundColor: Colors.white,
+      headerBackgroundColor: const Color(0xFFFFE082),
+      headerForegroundColor: Colors.black,
       confirmButtonStyle: ButtonStyle(
         foregroundColor: WidgetStateProperty.all(Colors.black),
         textStyle: WidgetStateProperty.all(
@@ -47,13 +47,13 @@ class AppTheme {
     useMaterial3: true,
     brightness: Brightness.dark,
     colorScheme: ColorScheme.fromSeed(
-      seedColor: const Color(0xFFFBCB57),
+      seedColor: const Color(0xFFFFE082),
       brightness: Brightness.dark,
-      primary: const Color(0xFFFBCB57),
-      secondary: const Color(0xFFF57F17),
+      primary: const Color(0xFFFFE082),
+      secondary: const Color(0xFFFFCC80),
       surface: const Color(0xFF1E1E1E),
       onPrimary: Colors.black,
-      onSecondary: Colors.white,
+      onSecondary: Colors.black,
       onSurface: Colors.white,
     ),
     scaffoldBackgroundColor: const Color(0xFF121212),

@@ -34,6 +34,7 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
   RecurrenceInterval _selectedRecurrence = RecurrenceInterval.none;
   List<Subtask> _subtasks = [];
   final TextEditingController _subtaskController = TextEditingController();
+  int _estimatedPomodoros = 0;
 
   @override
   void initState() {
@@ -48,6 +49,7 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
 
     _reminderDateTime = widget.todo?.reminderDateTime;
     _selectedRecurrence = widget.todo?.recurrence ?? RecurrenceInterval.none;
+    _estimatedPomodoros = widget.todo?.estimatedPomodoros ?? 0;
 
     // Deep copy subtasks to avoid modifying original list directly
     if (widget.todo != null) {
@@ -104,6 +106,7 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
           _reminderDateTime,
           _selectedRecurrence,
           _subtasks,
+          _estimatedPomodoros,
         );
       } else {
         final updatedTodo = Todo(
@@ -116,6 +119,7 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
           reminderDateTime: _reminderDateTime,
           recurrence: _selectedRecurrence,
           subtasks: _subtasks,
+          estimatedPomodoros: _estimatedPomodoros,
         );
         provider.updateTodo(updatedTodo);
       }
@@ -1097,6 +1101,126 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
                             ),
                           ),
                         ],
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // Pomodoro Estimation
+                      Text(
+                        'Focus Estimate (Pomodoros)',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: hintColor,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Consumer<TodoProvider>(
+                        builder: (context, provider, _) {
+                          final dailyUsage = provider.getDailyPomoUsage(
+                            _selectedDate,
+                          );
+                          // If editing, subtract current todo's original estimate to verify capacity correctly
+                          final currentTodoEstimate =
+                              widget.todo?.estimatedPomodoros ?? 0;
+                          final effectiveUsage =
+                              dailyUsage - currentTodoEstimate;
+                          final remaining =
+                              provider.dailyPomodoroCapacity - effectiveUsage;
+                          final canIncrease = (_estimatedPomodoros < remaining);
+
+                          return Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? Colors.grey[800]!.withOpacity(0.5)
+                                  : Colors.grey[50],
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.timer,
+                                          color: Colors.redAccent,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          '$_estimatedPomodoros x 30m',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: textColor,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          '(${(_estimatedPomodoros * 0.5).toStringAsFixed(1)} hrs)',
+                                          style: TextStyle(
+                                            color: hintColor,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        IconButton(
+                                          onPressed: _estimatedPomodoros > 0
+                                              ? () => setState(
+                                                  () => _estimatedPomodoros--,
+                                                )
+                                              : null,
+                                          icon: const Icon(
+                                            Icons.remove_circle_outline,
+                                          ),
+                                          color: hintColor,
+                                        ),
+                                        IconButton(
+                                          onPressed: canIncrease
+                                              ? () => setState(
+                                                  () => _estimatedPomodoros++,
+                                                )
+                                              : null,
+                                          icon: const Icon(Icons.add_circle),
+                                          color: canIncrease
+                                              ? primaryColor
+                                              : Colors.grey,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                if (!canIncrease) ...[
+                                  const SizedBox(height: 8),
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.warning_amber_rounded,
+                                        size: 16,
+                                        color: Colors.orange[700],
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        'Daily capacity reached (Max 8 hrs)',
+                                        style: TextStyle(
+                                          color: Colors.orange[700],
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ],
+                            ),
+                          );
+                        },
                       ),
 
                       const SizedBox(height: 24),

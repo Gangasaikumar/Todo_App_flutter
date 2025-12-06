@@ -51,10 +51,21 @@ A premium, feature-rich Todo application built with Flutter. Designed with a foc
 - **Onboarding Flow**: A seamless introduction guide for new users to get started.
 
 ### 8. ⚙️ Settings & Personalization
-- **Theme Control**: Manually switch between Light, Dark, or System Default themes.
-- **Sound Effects**: Enable or disable completion sounds to suit your environment.
-- **Notifications**: Manage task reminders and alert preferences.
-- **Dashboard**: View detailed statistics of your productivity, including weekly completion charts and category breakdown.
+- **New Settings UI**: A polished, card-based interface with elevated sections for a modern feel.
+- **Theme Control**: Switch between Light, Dark, or System Default themes.
+- **Notifications**: Toggle task reminders.
+- **Sound Effects**: Enable/disable satisfying completion sounds.
+- **Focus Configuration**: Customize your Pomodoro experience:
+    - **Focus Duration**: Adjust work sessions (15-60 mins).
+    - **Breaks**: Set Short (1-15 mins) and Long (5-45 mins) break durations.
+    - **Daily Goal**: Set your target number of focus hours per day.
+
+### 9. 🍅 Focus Mode (Pomodoro)
+- **Built-in Timer**: A dedicated Focus Screen to help you stay productive.
+- **Customizable Timer**: Work sessions and breaks are fully configurable.
+- **Visual Progress**: A beautiful circular timer that visualizes your remaining time.
+- **Task Integration**: Start a focus session directly from any task's detail view.
+- **Gamification**: Track your daily focus progress against your goal.
 
 ## 📱 Screenshots
 
