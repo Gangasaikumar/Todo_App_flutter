@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -36,8 +37,22 @@ class AppNotificationService {
       const AndroidInitializationSettings initializationSettingsAndroid =
           AndroidInitializationSettings('@mipmap/launcher_icon');
 
-      const InitializationSettings initializationSettings =
-          InitializationSettings(android: initializationSettingsAndroid);
+      const LinuxInitializationSettings initializationSettingsLinux =
+          LinuxInitializationSettings(defaultActionName: 'Open notification');
+
+      const WindowsInitializationSettings initializationSettingsWindows =
+          WindowsInitializationSettings(
+            appName: 'Daily Focus',
+            appUserModelId: 'com.example.daily_focus',
+            guid: 'a26517b0-f6cd-49eb-b877-543f62e0b1fb',
+          );
+
+      final InitializationSettings initializationSettings =
+          InitializationSettings(
+            android: initializationSettingsAndroid,
+            linux: initializationSettingsLinux,
+            windows: initializationSettingsWindows,
+          );
 
       await flutterLocalNotificationsPlugin.initialize(
         initializationSettings,
@@ -81,7 +96,9 @@ class AppNotificationService {
             >();
 
     if (androidImplementation == null) {
-      return false;
+      // On non-Android platforms, we assume permissions are either not needed or handled differently for now
+      // For Windows, creating the local notification doesn't require run-time permission in the same way
+      return !Platform.isAndroid;
     }
 
     final bool? exactAlarmGranted = await androidImplementation

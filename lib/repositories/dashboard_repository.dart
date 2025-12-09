@@ -153,7 +153,7 @@ class LocalDashboardRepository implements DashboardRepository {
 
     final totalXP = (allTimeCompleted * 10) + allTimeFocusMinutes;
     final currentLevel = (totalXP / 100).floor() + 1;
-    final nextLevelXP = 100; // Fixed 100 XP per level for simplicity
+    // final nextLevelXP = 100; // Fixed 100 XP per level for simplicity
     final currentLevelProgress = (totalXP % 100).toDouble();
 
     // Calculate Comparison Stats (Previous Period)
