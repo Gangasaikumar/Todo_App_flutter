@@ -346,7 +346,7 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
                                   },
                                   borderRadius: BorderRadius.circular(12),
                                   child: Container(
-                                    padding: const EdgeInsets.all(12),
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
                                     decoration: BoxDecoration(
                                       color: isDark
                                           ? Colors.grey[800]!.withOpacity(0.5)
@@ -380,7 +380,7 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
                               ],
                             ),
                           ),
-                          const SizedBox(width: 16),
+                          const SizedBox(width: 8),
                           // Category Dropdown
                           Expanded(
                             child: Column(
@@ -487,9 +487,9 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
                                                         ? Colors.grey[800]!
                                                               .withOpacity(0.5)
                                                         : Colors.grey[50],
-                                                    contentPadding:
-                                                        const EdgeInsets.symmetric(
-                                                          horizontal: 16,
+                                                        contentPadding:
+                                                            const EdgeInsets.symmetric(
+                                                          horizontal: 12,
                                                           vertical: 12,
                                                         ),
                                                     border: OutlineInputBorder(

@@ -47,9 +47,18 @@ class AppNotificationService {
             guid: 'a26517b0-f6cd-49eb-b877-543f62e0b1fb',
           );
 
+      const DarwinInitializationSettings initializationSettingsDarwin =
+          DarwinInitializationSettings(
+            requestAlertPermission: true,
+            requestBadgePermission: true,
+            requestSoundPermission: true,
+          );
+
       final InitializationSettings initializationSettings =
           InitializationSettings(
             android: initializationSettingsAndroid,
+            iOS: initializationSettingsDarwin,
+            macOS: initializationSettingsDarwin,
             linux: initializationSettingsLinux,
             windows: initializationSettingsWindows,
           );
@@ -89,25 +98,39 @@ class AppNotificationService {
   Future<bool> requestPermissions() async {
     await init();
 
-    final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
-        flutterLocalNotificationsPlugin
-            .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin
-            >();
+    if (Platform.isIOS || Platform.isMacOS) {
+      final bool? result = await flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+            IOSFlutterLocalNotificationsPlugin
+          >()
+          ?.requestPermissions(
+            alert: true,
+            badge: true,
+            sound: true,
+          );
+       return result ?? false;
+        
+    } else if (Platform.isAndroid) {
+      final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
+          flutterLocalNotificationsPlugin
+              .resolvePlatformSpecificImplementation<
+                AndroidFlutterLocalNotificationsPlugin
+              >();
 
-    if (androidImplementation == null) {
-      // On non-Android platforms, we assume permissions are either not needed or handled differently for now
-      // For Windows, creating the local notification doesn't require run-time permission in the same way
-      return !Platform.isAndroid;
+      if (androidImplementation == null) {
+        return false;
+      }
+
+      final bool? exactAlarmGranted = await androidImplementation
+          .requestExactAlarmsPermission();
+
+      final bool? notificationGranted = await androidImplementation
+          .requestNotificationsPermission();
+
+      return (exactAlarmGranted ?? true) && (notificationGranted ?? true);
     }
-
-    final bool? exactAlarmGranted = await androidImplementation
-        .requestExactAlarmsPermission();
-
-    final bool? notificationGranted = await androidImplementation
-        .requestNotificationsPermission();
-
-    return (exactAlarmGranted ?? true) && (notificationGranted ?? true);
+    
+    return true;
   }
 
   Future<void> showImmediateNotification() async {
@@ -128,6 +151,16 @@ class AppNotificationService {
 
     const NotificationDetails notificationDetails = NotificationDetails(
       android: androidDetails,
+      iOS: DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+      ),
+      macOS: DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+      ),
     );
 
     await flutterLocalNotificationsPlugin.show(
@@ -158,6 +191,16 @@ class AppNotificationService {
 
     const NotificationDetails notificationDetails = NotificationDetails(
       android: androidDetails,
+      iOS: DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+      ),
+      macOS: DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+      ),
     );
 
     // Use a unique ID based on time to avoid overwriting
@@ -222,6 +265,16 @@ class AppNotificationService {
             enableVibration: true,
             playSound: true,
             fullScreenIntent: true,
+          ),
+          iOS: DarwinNotificationDetails(
+            presentAlert: true,
+            presentBadge: true,
+            presentSound: true,
+          ),
+          macOS: DarwinNotificationDetails(
+            presentAlert: true,
+            presentBadge: true,
+            presentSound: true,
           ),
         ),
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
